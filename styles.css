@@ -103,6 +103,21 @@ textarea:focus-visible,
   padding: 1.2rem 0;
 }
 
+.brand-lockup {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  min-width: 0;
+}
+
+.brand-logo {
+  width: min(235px, 42vw);
+  height: auto;
+  flex: 0 0 auto;
+  border-radius: 4px;
+  background: #ffffff;
+}
+
 h1,
 h2,
 h3,
@@ -512,6 +527,15 @@ dialog::backdrop {
   nav,
   .action-row {
     width: 100%;
+  }
+
+  .brand-lockup {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .brand-logo {
+    width: min(260px, 78vw);
   }
 
   .nav-tab,
