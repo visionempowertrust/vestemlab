@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Vision Empower STEM Lab</title>
+    <meta
+      name="description"
+      content="Accessible STEM lab resources and activity manuals for Vision Empower."
+    >
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <header class="site-header">
+      <div class="shell header-grid">
+        <div>
+          <p class="eyebrow">Vision Empower</p>
+          <h1>Accessible STEM Lab</h1>
+        </div>
+        <nav aria-label="Primary">
+          <button class="nav-tab is-active" type="button" data-view-button="resources">Resources</button>
+          <button class="nav-tab" type="button" data-view-button="manuals">Manuals</button>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="view is-active" id="resources-view" aria-labelledby="resources-heading">
+        <div class="shell section-head">
+          <div>
+            <p class="eyebrow">Accessible Resources Listing</p>
+            <h2 id="resources-heading">Lab materials catalogue</h2>
+            <p class="lede">Manage tactile models, assistive technology, books, kits, and experiment apparatus with images, uses, and video references.</p>
+          </div>
+          <div class="action-row" aria-label="Resource actions">
+            <button class="primary" type="button" data-open-resource-form>Add resource</button>
+            <button type="button" data-export="resources">Export resources</button>
+          </div>
+        </div>
+
+        <div class="shell layout">
+          <aside class="panel filters" aria-label="Resource filters">
+            <label>
+              Search resources
+              <input id="resource-search" type="search" placeholder="Name, use, supplier">
+            </label>
+            <label>
+              Category
+              <select id="subject-filter"></select>
+            </label>
+            <label>
+              Media
+              <select id="media-filter">
+                <option value="all">All resources</option>
+                <option value="image">With image</option>
+                <option value="video">With video</option>
+                <option value="both">With image and video</option>
+              </select>
+            </label>
+            <button type="button" data-reset-seed>Reload starter seed</button>
+          </aside>
+
+          <div class="content-stack">
+            <div class="stat-strip" aria-label="Resource summary">
+              <div><strong id="resource-count">0</strong><span>resources</span></div>
+              <div><strong id="manual-linked-count">0</strong><span>used in manuals</span></div>
+              <div><strong id="subject-count">0</strong><span>categories</span></div>
+            </div>
+            <div id="resource-list" class="resource-grid" aria-live="polite"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="view" id="manuals-view" aria-labelledby="manuals-heading">
+        <div class="shell section-head">
+          <div>
+            <p class="eyebrow">Accessible Manual</p>
+            <h2 id="manuals-heading">Activity and experiment manuals</h2>
+            <p class="lede">Create structured manuals using the Vision Empower template and attach resources from the accessible catalogue.</p>
+          </div>
+          <div class="action-row" aria-label="Manual actions">
+            <button class="primary" type="button" data-open-manual-form>Add manual</button>
+            <button type="button" data-export="manuals">Export manuals</button>
+          </div>
+        </div>
+
+        <div class="shell layout">
+          <aside class="panel filters" aria-label="Manual filters">
+            <label>
+              Search manuals
+              <input id="manual-search" type="search" placeholder="Name, concept, resource">
+            </label>
+            <label>
+              Concept
+              <input id="concept-filter" type="search" placeholder="TIK or science concept">
+            </label>
+            <label>
+              Subject
+              <select id="manual-subject-filter"></select>
+            </label>
+          </aside>
+
+          <div id="manual-list" class="manual-list" aria-live="polite"></div>
+        </div>
+      </section>
+    </main>
+
+    <dialog id="resource-dialog" aria-labelledby="resource-dialog-title">
+      <form id="resource-form" method="dialog" class="editor">
+        <div class="dialog-head">
+          <h3 id="resource-dialog-title">Resource</h3>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Close resource form">x</button>
+        </div>
+        <input type="hidden" name="id">
+        <div class="form-grid">
+          <label>
+            Name
+            <input name="name" required>
+          </label>
+          <label>
+            Category
+            <input name="subject" list="subject-options" required>
+          </label>
+          <label class="span-2">
+            Picture URL
+            <input name="image" type="url" placeholder="https://...">
+          </label>
+          <label class="span-2">
+            Video URL
+            <input name="video" type="url" placeholder="https://youtu.be/...">
+          </label>
+          <label class="span-2">
+            Uses
+            <textarea name="uses" rows="4" required></textarea>
+          </label>
+          <label>
+            Supplier
+            <input name="supplier">
+          </label>
+          <label>
+            Tags
+            <input name="tags" placeholder="tactile, physics, grade 8">
+          </label>
+        </div>
+        <div class="dialog-actions">
+          <button type="button" data-close-dialog>Cancel</button>
+          <button class="primary" type="submit">Save resource</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="manual-dialog" aria-labelledby="manual-dialog-title">
+      <form id="manual-form" method="dialog" class="editor">
+        <div class="dialog-head">
+          <h3 id="manual-dialog-title">Manual</h3>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Close manual form">x</button>
+        </div>
+        <input type="hidden" name="id">
+        <label>
+          Name
+          <input name="name" required>
+        </label>
+        <label>
+          Subject
+          <select name="subject" id="manual-subject" required></select>
+        </label>
+        <label>
+          Objective: What we have to do?
+          <textarea name="objective" rows="3" required></textarea>
+        </label>
+        <label>
+          Resources: What do we need? Pick from accessible resources
+          <select name="resourceIds" id="manual-resource-picker" multiple size="8"></select>
+        </label>
+        <label>
+          Other resources
+          <textarea name="otherResources" rows="3" placeholder="Add resources not yet listed in the accessible catalogue"></textarea>
+        </label>
+        <label>
+          Steps: How do we proceed?
+          <textarea name="steps" rows="5" required></textarea>
+        </label>
+        <label>
+          Observations: What do we observe?
+          <textarea name="observations" rows="3"></textarea>
+        </label>
+        <label>
+          Inferences: What do we conclude?
+          <textarea name="inferences" rows="3"></textarea>
+        </label>
+        <label>
+          Concepts: (TIK)
+          <textarea name="concepts" rows="3"></textarea>
+        </label>
+        <div class="dialog-actions">
+          <button type="button" data-close-dialog>Cancel</button>
+          <button class="primary" type="submit">Save manual</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="import-dialog" aria-labelledby="import-dialog-title">
+      <form id="import-form" method="dialog" class="editor">
+        <div class="dialog-head">
+          <h3 id="import-dialog-title">Import ARC table HTML</h3>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Close import form">x</button>
+        </div>
+        <p class="hint">Paste the table HTML from the ARC STEM Lab Materials page to import all rows into this local catalogue.</p>
+        <textarea name="html" rows="10" required></textarea>
+        <div class="dialog-actions">
+          <button type="button" data-close-dialog>Cancel</button>
+          <button class="primary" type="submit">Import resources</button>
+        </div>
+      </form>
+    </dialog>
+
+    <div class="shell utility-bar">
+      <button type="button" data-open-import>Import ARC table HTML</button>
+      <label class="file-button">
+        Import JSON
+        <input id="json-import" type="file" accept="application/json">
+      </label>
+      <span id="toast" role="status" aria-live="polite"></span>
+    </div>
+
+    <datalist id="subject-options"></datalist>
+    <script src="app.js"></script>
+  </body>
+</html>
