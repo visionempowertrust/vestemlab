@@ -34,7 +34,8 @@ textarea {
 }
 
 button,
-.file-button {
+.file-button,
+.button-link {
   border: 1px solid var(--line);
   background: var(--paper);
   color: var(--ink);
@@ -45,7 +46,8 @@ button,
 }
 
 button:hover,
-.file-button:hover {
+.file-button:hover,
+.button-link:hover {
   border-color: var(--brand);
 }
 
@@ -161,19 +163,39 @@ h3 {
 nav {
   display: flex;
   gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
-.nav-tab {
+.nav-tab,
+.nav-link-tab {
   background: transparent;
   color: #ffffff;
   border-color: rgba(255, 255, 255, 0.45);
 }
 
-.nav-tab.is-active {
+.nav-tab.is-active,
+.nav-link-tab.is-active {
   background: var(--accent);
   border-color: var(--accent);
   color: var(--ink);
   font-weight: 800;
+}
+
+.nav-link-tab,
+.button-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  border-radius: 6px;
+  padding: 0.55rem 0.85rem;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.button-link {
+  background: var(--paper);
+  color: var(--ink);
 }
 
 .view {
@@ -183,6 +205,56 @@ nav {
 
 .view.is-active {
   display: block;
+}
+
+.landing-view {
+  padding-top: 0;
+}
+
+.landing-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1.5rem;
+  align-items: end;
+  padding: 2rem 0 1.5rem;
+}
+
+.landing-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  justify-content: flex-end;
+}
+
+.landing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.landing-card {
+  min-height: 260px;
+  display: grid;
+  align-content: space-between;
+  gap: 1rem;
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.landing-card p {
+  color: var(--muted);
+  margin-bottom: 0;
+}
+
+.landing-stat {
+  display: block;
+  color: var(--brand-dark);
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 0.7rem;
 }
 
 .section-head {
@@ -529,6 +601,10 @@ dialog::backdrop {
   grid-column: 1 / -1;
 }
 
+.three-column {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 .dialog-actions {
   justify-content: flex-end;
   border-top: 1px solid var(--line);
@@ -561,15 +637,58 @@ dialog::backdrop {
   font-weight: 800;
 }
 
+.students-page {
+  padding: 2rem 0 5rem;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  border: 1px solid color-mix(in srgb, var(--brand), transparent 65%);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--brand), transparent 92%);
+  color: var(--brand-dark);
+  font-weight: 800;
+  padding: 0.35rem 0.8rem;
+}
+
+.student-form,
+.student-list-panel {
+  padding: 1rem;
+}
+
+.section-heading-inline {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.student-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(72px, 1fr));
+  gap: 0.5rem;
+  min-width: 160px;
+}
+
+.empty-table-cell {
+  color: var(--muted);
+  text-align: center;
+}
+
 @media (max-width: 820px) {
   .header-grid,
   .section-head,
-  .layout {
+  .layout,
+  .landing-hero {
     grid-template-columns: 1fr;
   }
 
   nav,
-  .action-row {
+  .action-row,
+  .landing-actions {
     width: 100%;
   }
 
@@ -583,6 +702,7 @@ dialog::backdrop {
   }
 
   .nav-tab,
+  .nav-link-tab,
   .action-row button {
     flex: 1 1 auto;
   }
@@ -596,7 +716,8 @@ dialog::backdrop {
   }
 
   .stat-strip,
-  .form-grid {
+  .form-grid,
+  .landing-grid {
     grid-template-columns: 1fr;
   }
 
@@ -643,6 +764,11 @@ dialog::backdrop {
   }
 
   .table-actions {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .student-actions {
     min-width: 0;
     width: 100%;
   }

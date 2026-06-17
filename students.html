@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Students | Vision Empower STEM Lab</title>
+    <meta
+      name="description"
+      content="Student registration for the Vision Empower Accessible STEM Lab portal."
+    >
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <header class="site-header">
+      <div class="shell header-grid">
+        <div class="brand-lockup">
+          <a href="index.html" aria-label="Accessible STEM Lab Portal home">
+            <img class="brand-logo" src="assets/vision-empower-logo.png" alt="Vision Empower">
+          </a>
+          <h1>Accessible STEM Lab Portal</h1>
+        </div>
+        <nav aria-label="Primary">
+          <a class="nav-tab nav-link-tab" href="index.html">Home</a>
+          <a class="nav-tab nav-link-tab" href="index.html#resources-view">Resources</a>
+          <a class="nav-tab nav-link-tab" href="index.html#manuals-view">Manuals</a>
+          <a class="nav-tab nav-link-tab is-active" href="students.html">Students</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main" class="students-page">
+      <section class="shell section-head">
+        <div>
+          <p class="eyebrow">Students</p>
+          <h2>Student registration</h2>
+          <p class="lede">Create and maintain student profiles for Accessible STEM Lab activities.</p>
+        </div>
+        <span id="students-status" class="status-pill" role="status" aria-live="polite">Ready</span>
+      </section>
+
+      <section class="shell content-stack">
+        <form id="student-registration-form" class="panel student-form">
+          <input id="student-id" type="hidden">
+
+          <div class="form-grid three-column">
+            <label for="student-state">
+              State
+              <select id="student-state" required></select>
+            </label>
+            <label for="student-district">
+              District
+              <select id="student-district" required></select>
+            </label>
+            <label for="student-school">
+              School
+              <input id="student-school" required autocomplete="off">
+            </label>
+
+            <label for="student-name">
+              Name
+              <input id="student-name" required autocomplete="off">
+            </label>
+            <label for="student-gender">
+              Gender
+              <select id="student-gender" required>
+                <option>Male</option>
+                <option>Female</option>
+              </select>
+            </label>
+            <label for="student-grade">
+              Grade
+              <select id="student-grade" required></select>
+            </label>
+
+            <label for="board-of-education">
+              Board Of Education
+              <input id="board-of-education" autocomplete="off">
+            </label>
+            <label for="vision-level">
+              Vision level
+              <select id="vision-level" required>
+                <option>Completely blind</option>
+                <option>Low Vision</option>
+              </select>
+            </label>
+            <label for="regional-language">
+              Regional Language
+              <input id="regional-language" autocomplete="off">
+            </label>
+
+            <label for="other-physical-disabilities">
+              Other Physical Disabilities
+              <select id="other-physical-disabilities" required></select>
+            </label>
+            <label for="cognitive-disabilities">
+              Any Cognitive Disabilities
+              <select id="cognitive-disabilities" required></select>
+            </label>
+            <label for="is-braille-literate">
+              Is Braille Literate
+              <select id="is-braille-literate" required></select>
+            </label>
+
+            <label for="braille-reading-level">
+              Braille Reading Level
+              <select id="braille-reading-level" required></select>
+            </label>
+            <label for="braille-writing-level">
+              Braille Writing Level
+              <select id="braille-writing-level" required></select>
+            </label>
+            <label for="knows-taylor-frame">
+              Knows Taylor Frame
+              <select id="knows-taylor-frame" required></select>
+            </label>
+
+            <label for="knows-nemeth">
+              Knows Nemeth
+              <select id="knows-nemeth" required></select>
+            </label>
+            <label for="knows-using-computer">
+              Knows using Computer
+              <select id="knows-using-computer" required></select>
+            </label>
+            <label for="knows-maths-on-computer">
+              Knows Maths on Computer
+              <select id="knows-maths-on-computer" required></select>
+            </label>
+          </div>
+
+          <div class="dialog-actions">
+            <button id="reset-student-form" type="button">Clear</button>
+            <button id="save-student" class="primary" type="submit">Add student</button>
+          </div>
+        </form>
+
+        <section class="panel student-list-panel" aria-labelledby="registered-students-heading">
+          <div class="section-heading-inline">
+            <h3 id="registered-students-heading">Registered students</h3>
+            <span id="students-count" class="meta">0 students</span>
+          </div>
+          <div class="resource-table-wrap">
+            <table class="resource-table students-table">
+              <thead>
+                <tr>
+                  <th scope="col">State</th>
+                  <th scope="col">District</th>
+                  <th scope="col">School</th>
+                  <th scope="col">Name</th>
+                  <th scope="col">Gender</th>
+                  <th scope="col">Grade</th>
+                  <th scope="col">Vision level</th>
+                  <th scope="col">Braille</th>
+                  <th scope="col">Computer</th>
+                  <th scope="col">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="registered-students-table"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <div class="shell utility-bar">
+      <span id="toast" role="status" aria-live="polite"></span>
+    </div>
+
+    <script src="india-locations.js"></script>
+    <script src="students.js"></script>
+  </body>
+</html>

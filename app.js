@@ -48,6 +48,9 @@ const manualDetailsDialog = document.querySelector("#manual-details-dialog");
 document.querySelectorAll("[data-view-button]").forEach((button) => {
   button.addEventListener("click", () => setView(button.dataset.viewButton));
 });
+document.querySelectorAll("[data-view-link]").forEach((button) => {
+  button.addEventListener("click", () => setView(button.dataset.viewLink));
+});
 
 document.querySelector("[data-open-resource-form]").addEventListener("click", () => openResourceForm());
 document.querySelector("[data-open-manual-form]").addEventListener("click", () => openManualForm());
@@ -73,6 +76,7 @@ resourceForm.addEventListener("submit", saveResource);
 manualForm.addEventListener("submit", saveManual);
 
 render();
+setInitialView();
 
 function loadState() {
   const stored = localStorage.getItem(STORAGE_KEY);
@@ -576,6 +580,12 @@ function renderStats() {
   document.querySelector("#subject-count").textContent = uniqueSubjects().length;
   const used = new Set(state.manuals.flatMap((manual) => manual.resourceIds || []));
   document.querySelector("#manual-linked-count").textContent = used.size;
+  const homeResourceCount = document.querySelector("#home-resource-count");
+  const homeManualCount = document.querySelector("#home-manual-count");
+  const homeSubjectCount = document.querySelector("#home-subject-count");
+  if (homeResourceCount) homeResourceCount.textContent = state.resources.length;
+  if (homeManualCount) homeManualCount.textContent = state.manuals.length;
+  if (homeSubjectCount) homeSubjectCount.textContent = uniqueSubjects().length;
 }
 
 function openResourceForm(id) {
@@ -722,6 +732,13 @@ function setView(view) {
   document.querySelectorAll(".view").forEach((section) => {
     section.classList.toggle("is-active", section.id === `${view}-view`);
   });
+}
+
+function setInitialView() {
+  const view = window.location.hash.replace("#", "").replace("-view", "");
+  if (["home", "resources", "manuals"].includes(view)) {
+    setView(view);
+  }
 }
 
 function focusResource(id) {
