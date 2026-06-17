@@ -4,6 +4,18 @@ const SESSIONS_STORAGE_KEY = "veStemLabSessions.v1";
 const locations = window.INDIA_LOCATIONS || {};
 const states = window.INDIA_STATES || Object.keys(locations).sort((a, b) => a.localeCompare(b));
 const fallbackSubjects = ["Basic Science", "Maths", "Biology", "Physics", "Chemistry", "Assistive Technologies"];
+const rubricCriteria = [
+  { key: "materialHandling", label: "Material handling" },
+  { key: "safety", label: "Safety" },
+  { key: "participation", label: "Participation" },
+  { key: "observationInference", label: "Observation and inference" }
+];
+const rubricLevels = [
+  { value: "4", label: "4 - Independent" },
+  { value: "3", label: "3 - With prompts" },
+  { value: "2", label: "2 - Needs support" },
+  { value: "1", label: "1 - Not yet" }
+];
 const $ = (selector) => document.querySelector(selector);
 
 let students = loadArray(STUDENTS_STORAGE_KEY);
@@ -106,7 +118,8 @@ function addAttendanceStudent(student) {
     id: typeof student === "string" ? makeId("att") : student.id,
     name,
     grade: typeof student === "string" ? "" : student.grade,
-    present: true
+    present: true,
+    rubric: defaultRubric()
   });
   renderAttendanceTable();
 }
@@ -131,7 +144,7 @@ function addSchoolRoster() {
 function renderAttendanceTable() {
   $("#attendance-count").textContent = `${attendance.length} student${attendance.length === 1 ? "" : "s"}`;
   if (!attendance.length) {
-    $("#attendance-table").innerHTML = '<tr><td colspan="4" class="empty-table-cell">No students added for attendance yet.</td></tr>';
+    $("#attendance-table").innerHTML = '<tr><td colspan="5" class="empty-table-cell">No students added for attendance yet.</td></tr>';
     return;
   }
   $("#attendance-table").innerHTML = attendance.map((student) => `
@@ -144,11 +157,32 @@ function renderAttendanceTable() {
           Present
         </label>
       </td>
+      <td data-label="Performance rubric">
+        <div class="rubric-grid">
+          ${rubricCriteria.map((criterion) => rubricSelect(student, criterion)).join("")}
+        </div>
+      </td>
       <td data-label="Actions">
         <button class="danger" type="button" data-remove-attendance="${escapeAttr(student.id)}">Remove</button>
       </td>
     </tr>
   `).join("");
+}
+
+function rubricSelect(student, criterion) {
+  const value = String(student.rubric?.[criterion.key] || "3");
+  return `
+    <label>
+      ${escapeHtml(criterion.label)}
+      <select data-rubric-student="${escapeAttr(student.id)}" data-rubric-key="${escapeAttr(criterion.key)}">
+        ${rubricLevels.map((level) => `<option value="${level.value}" ${level.value === value ? "selected" : ""}>${escapeHtml(level.label)}</option>`).join("")}
+      </select>
+    </label>
+  `;
+}
+
+function defaultRubric() {
+  return Object.fromEntries(rubricCriteria.map((criterion) => [criterion.key, "3"]));
 }
 
 function collectSession() {
@@ -162,7 +196,10 @@ function collectSession() {
     subject: $("#session-subject").value,
     activityId: $("#session-activity").value,
     activityName: activity?.name || $("#session-activity").selectedOptions[0]?.textContent || "",
-    attendance: attendance.map((student) => ({ ...student }))
+    attendance: attendance.map((student) => ({
+      ...student,
+      rubric: { ...defaultRubric(), ...(student.rubric || {}) }
+    }))
   };
 }
 
@@ -194,11 +231,12 @@ function persistSessions() {
 function renderSessionsTable() {
   $("#sessions-count").textContent = `${sessions.length} session${sessions.length === 1 ? "" : "s"}`;
   if (!sessions.length) {
-    $("#sessions-table").innerHTML = '<tr><td colspan="8" class="empty-table-cell">No lab sessions saved yet.</td></tr>';
+    $("#sessions-table").innerHTML = '<tr><td colspan="9" class="empty-table-cell">No lab sessions saved yet.</td></tr>';
     return;
   }
   $("#sessions-table").innerHTML = [...sessions].sort((a, b) => b.date.localeCompare(a.date)).map((session) => {
     const present = session.attendance.filter((student) => student.present).length;
+    const score = sessionRubricAverage(session);
     return `
       <tr>
         <td data-label="Date">${escapeHtml(session.date)}</td>
@@ -208,6 +246,7 @@ function renderSessionsTable() {
         <td data-label="Activity"><strong>${escapeHtml(session.activityName)}</strong></td>
         <td data-label="Facilitator">${escapeHtml(session.facilitator)}</td>
         <td data-label="Attendance">${present}/${session.attendance.length} present</td>
+        <td data-label="Performance">${score ? `${score}/4 avg` : "Not rated"}</td>
         <td data-label="Actions">
           <div class="student-actions">
             <button type="button" data-edit-session="${escapeAttr(session.id)}">Edit</button>
@@ -229,7 +268,10 @@ function editSession(id) {
   $("#session-school").value = session.school;
   renderSubjectOptions(session.subject);
   renderActivityOptions(session.activityId);
-  attendance = session.attendance.map((student) => ({ ...student }));
+  attendance = session.attendance.map((student) => ({
+    ...student,
+    rubric: { ...defaultRubric(), ...(student.rubric || {}) }
+  }));
   renderStudentOptions();
   renderAttendanceTable();
   setStatus("Editing");
@@ -260,15 +302,33 @@ function resetSessionForm() {
 
 function handleAttendanceClick(event) {
   const present = event.target.closest("[data-attendance-present]");
+  const rubric = event.target.closest("[data-rubric-student]");
   const remove = event.target.closest("[data-remove-attendance]");
   if (present) {
     const student = attendance.find((item) => item.id === present.dataset.attendancePresent);
     if (student) student.present = present.checked;
   }
+  if (rubric) {
+    const student = attendance.find((item) => item.id === rubric.dataset.rubricStudent);
+    if (student) {
+      student.rubric = { ...defaultRubric(), ...(student.rubric || {}) };
+      student.rubric[rubric.dataset.rubricKey] = rubric.value;
+    }
+  }
   if (remove) {
     attendance = attendance.filter((item) => item.id !== remove.dataset.removeAttendance);
     renderAttendanceTable();
   }
+}
+
+function sessionRubricAverage(session) {
+  const scores = session.attendance.flatMap((student) => {
+    const rubric = { ...defaultRubric(), ...(student.rubric || {}) };
+    return rubricCriteria.map((criterion) => Number(rubric[criterion.key])).filter(Boolean);
+  });
+  if (!scores.length) return "";
+  const average = scores.reduce((sum, score) => sum + score, 0) / scores.length;
+  return average.toFixed(1);
 }
 
 function handleSessionsClick(event) {
