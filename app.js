@@ -41,6 +41,7 @@ const resourceForm = document.querySelector("#resource-form");
 const manualForm = document.querySelector("#manual-form");
 const importForm = document.querySelector("#import-form");
 const resourceDialog = document.querySelector("#resource-dialog");
+const resourceDetailsDialog = document.querySelector("#resource-details-dialog");
 const manualDialog = document.querySelector("#manual-dialog");
 const manualDetailsDialog = document.querySelector("#manual-details-dialog");
 const importDialog = document.querySelector("#import-dialog");
@@ -330,68 +331,87 @@ function renderResources() {
   });
 
   resourceList.innerHTML = resources.length
-    ? resources.map(resourceCard).join("")
+    ? resourceTable(resources)
     : `<div class="empty-state">No resources match the current filters.</div>`;
 
   resourceList.querySelectorAll("[data-edit-resource]").forEach((button) => {
     button.addEventListener("click", () => openResourceForm(button.dataset.editResource));
   });
-  resourceList.querySelectorAll("[data-delete-resource]").forEach((button) => {
-    button.addEventListener("click", () => deleteResource(button.dataset.deleteResource));
-  });
-  resourceList.querySelectorAll("[data-toggle-resource-details]").forEach((button) => {
-    button.addEventListener("click", () => toggleResourceDetails(button));
+  resourceList.querySelectorAll("[data-show-resource]").forEach((button) => {
+    button.addEventListener("click", () => openResourceDetails(button.dataset.showResource));
   });
 }
 
-function resourceCard(resource) {
-  const tags = [resource.subject, ...(resource.tags || [])].filter(Boolean);
-  const detailsId = `resource-details-${resource.id}`;
+function resourceTable(resources) {
   return `
-    <article class="resource-card" id="resource-${resource.id}">
-      <div class="resource-media">
-        ${resource.image ? `<img src="${escapeAttribute(resource.image)}" alt="${escapeAttribute(resource.name)}">` : `<div class="placeholder">No picture yet</div>`}
-      </div>
-      <div class="card-body">
-        <dl class="resource-facts">
-          <div>
-            <dt>Category</dt>
-            <dd>${escapeHtml(resource.subject || "Uncategorized")}</dd>
-          </div>
-          <div>
-            <dt>Item Name</dt>
-            <dd><h3>${escapeHtml(resource.name)}</h3></dd>
-          </div>
-          <div>
-            <dt>Uses</dt>
-            <dd>${escapeHtml(resource.uses || "Uses not documented yet.")}</dd>
-          </div>
-        </dl>
-        <div class="resource-details">
-          <button type="button" class="details-toggle" data-toggle-resource-details aria-expanded="false" aria-controls="${detailsId}">Show Details</button>
-          <div class="details-body" id="${detailsId}" hidden>
-            <p><strong>Supplier:</strong> ${escapeHtml(resource.supplier || "Supplier not listed")}</p>
-            <div class="badge-row">${tags.map((tag) => `<span class="badge">${escapeHtml(tag)}</span>`).join("")}</div>
-            <div class="card-actions">
-              ${resource.video ? `<a href="${escapeAttribute(resource.video)}" target="_blank" rel="noreferrer">Video</a>` : ""}
-              ${resource.image ? `<a href="${escapeAttribute(resource.image)}" target="_blank" rel="noreferrer">Open image</a>` : ""}
-              <button type="button" data-edit-resource="${resource.id}">Edit</button>
-              <button class="danger" type="button" data-delete-resource="${resource.id}">Delete</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </article>
+    <div class="resource-table-wrap">
+      <table class="resource-table">
+        <thead>
+          <tr>
+            <th scope="col">Category</th>
+            <th scope="col">Item name</th>
+            <th scope="col">Uses</th>
+            <th scope="col">Supplier</th>
+            <th scope="col">More Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${resources.map(resourceRow).join("")}
+        </tbody>
+      </table>
+    </div>
   `;
 }
 
-function toggleResourceDetails(button) {
-  const target = document.getElementById(button.getAttribute("aria-controls"));
-  if (!target) return;
-  const expanded = button.getAttribute("aria-expanded") === "true";
-  button.setAttribute("aria-expanded", String(!expanded));
-  button.textContent = expanded ? "Show Details" : "Hide Details";
-  target.hidden = expanded;
+function resourceRow(resource) {
+  return `
+    <tr id="resource-${resource.id}">
+      <td data-label="Category">${escapeHtml(resource.subject || "Uncategorized")}</td>
+      <td data-label="Item name"><strong>${escapeHtml(resource.name)}</strong></td>
+      <td data-label="Uses">${escapeHtml(resource.uses || "Uses not documented yet.")}</td>
+      <td data-label="Supplier">${escapeHtml(resource.supplier || "Supplier not listed")}</td>
+      <td data-label="More Actions">
+        <div class="table-actions">
+          <button type="button" data-show-resource="${resource.id}">Show Details</button>
+          <button type="button" data-edit-resource="${resource.id}">Edit</button>
+        </div>
+      </td>
+    </tr>
+  `;
+}
+
+function openResourceDetails(id) {
+  const resource = state.resources.find((item) => item.id === id);
+  if (!resource) return;
+  const tags = [resource.subject, ...(resource.tags || [])].filter(Boolean);
+  document.querySelector("#resource-details-title").textContent = resource.name;
+  document.querySelector("#resource-details-content").innerHTML = `
+    <div class="resource-detail-grid">
+      <div class="resource-detail-media">
+        ${resource.image ? `<img src="${escapeAttribute(resource.image)}" alt="${escapeAttribute(resource.name)}">` : `<div class="placeholder">No image available</div>`}
+      </div>
+      <div class="resource-detail-copy">
+        <p><strong>Category:</strong> ${escapeHtml(resource.subject || "Uncategorized")}</p>
+        <p><strong>Item name:</strong> ${escapeHtml(resource.name)}</p>
+        <p><strong>Uses:</strong> ${escapeHtml(resource.uses || "Uses not documented yet.")}</p>
+        <p><strong>Supplier:</strong> ${escapeHtml(resource.supplier || "Supplier not listed")}</p>
+        <div class="badge-row">${tags.map((tag) => `<span class="badge">${escapeHtml(tag)}</span>`).join("")}</div>
+        <div class="card-actions">
+          ${resource.video ? `<a href="${escapeAttribute(resource.video)}" target="_blank" rel="noreferrer">Video</a>` : ""}
+          ${resource.image ? `<a href="${escapeAttribute(resource.image)}" target="_blank" rel="noreferrer">Open image</a>` : ""}
+          <button type="button" data-edit-resource-from-details="${resource.id}">Edit</button>
+        </div>
+      </div>
+    </div>
+  `;
+  const editButton = document.querySelector("[data-edit-resource-from-details]");
+  if (editButton) {
+    editButton.addEventListener("click", () => {
+      resourceDetailsDialog.close();
+      openResourceForm(editButton.dataset.editResourceFromDetails);
+    });
+  }
+  resourceDetailsDialog.showModal();
 }
 
 function renderManuals() {
