@@ -416,6 +416,31 @@ textarea {
   gap: 0.8rem;
 }
 
+.manual-dashboard-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: center;
+}
+
+.manual-subject-label {
+  color: var(--brand-dark);
+  margin-bottom: 0.25rem;
+}
+
+.manual-details-summary {
+  display: grid;
+  gap: 0.35rem;
+  background: var(--soft);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0.85rem;
+}
+
+.manual-details-summary p {
+  margin-bottom: 0;
+}
+
 .manual-section {
   border-top: 1px solid var(--line);
   padding-top: 0.7rem;
@@ -553,6 +578,10 @@ dialog::backdrop {
   }
 
   .resource-card {
+    grid-template-columns: 1fr;
+  }
+
+  .manual-dashboard-row {
     grid-template-columns: 1fr;
   }
 

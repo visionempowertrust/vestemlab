@@ -1,4 +1,4 @@
-const STORAGE_KEY = "veStemLabData.v1";
+const STORAGE_KEY = "veStemLabData.v2";
 const resourceCategories = [
   "Computational Thinking (CT)",
   "Basic Science",
@@ -6,7 +6,7 @@ const resourceCategories = [
   "Biology",
   "Physics",
   "Chemistry",
-  "Assistive Technologies Use",
+  "Assistive Technologies",
   "Books",
   "Hardware assets"
 ];
@@ -16,43 +16,21 @@ const manualSubjects = [
   "Biology",
   "Physics",
   "Chemistry",
-  "Assistive Technologies Use"
+  "Assistive Technologies"
 ];
 
-const seedResources = [
-  { subject: "Assistive Technologies Use", name: "IRIS", image: "", video: "https://youtu.be/SCD1m5F9iDs", supplier: "Vembi Tech", uses: "Assistive technology resource for accessible reading and learning support." },
-  { subject: "Assistive Technologies Use", name: "Annie", image: "", video: "", supplier: "Thinkerbell", uses: "Braille literacy and independent practice for early learners." },
-  { subject: "Assistive Technologies Use", name: "Eklavya Keyboard", image: "", video: "", supplier: "Innovation hub", uses: "Keyboard access and digital literacy practice." },
-  { subject: "Computational Thinking (CT)", name: "Tactile flowchart kit", image: "", video: "", supplier: "Vision Empower", uses: "Build and trace algorithms, sequences, loops, and conditionals through touch." },
-  { subject: "Basic Science", name: "Observation tray", image: "", video: "", supplier: "Vision Empower", uses: "Organize materials for safe multisensory observation and comparison." },
-  { subject: "Maths", name: "Tactile geometry set", image: "", video: "", supplier: "Vision Empower", uses: "Explore shapes, angles, symmetry, perimeter, and area accessibly." },
-  { subject: "Biology", name: "Amoeba", image: "https://visionempowertrust.org/arc/wp-content/uploads/Amoeba.webp", video: "", supplier: "Labkafe", uses: "Tactile exploration of unicellular organisms and cell structure." },
-  { subject: "Biology", name: "Animal cell", image: "https://visionempowertrust.org/arc/wp-content/uploads/Animal-Cell.jpeg", video: "", supplier: "Labkafe", uses: "Identify cell organelles through a touchable model." },
-  { subject: "Biology", name: "DNA model", image: "https://visionempowertrust.org/arc/wp-content/uploads/DNA.webp", video: "", supplier: "Labkafe", uses: "Demonstrate double helix structure and base-pair arrangement." },
-  { subject: "Biology", name: "Human brain", image: "https://visionempowertrust.org/arc/wp-content/uploads/Human-brain.webp", video: "", supplier: "Labkafe", uses: "Understand major brain regions with tactile orientation." },
-  { subject: "Biology", name: "Human heart", image: "https://visionempowertrust.org/arc/wp-content/uploads/Human-Heart.webp", video: "", supplier: "Labkafe", uses: "Trace chambers, valves, and blood-flow pathways." },
-  { subject: "Biology", name: "Human eye", image: "https://visionempowertrust.org/arc/wp-content/uploads/Human-eye.webp", video: "", supplier: "Labkafe", uses: "Study eye parts and connect them to vision concepts." },
-  { subject: "Biology", name: "Human Skeleton system", image: "https://visionempowertrust.org/arc/wp-content/uploads/Human-Skeleton-system.webp", video: "", supplier: "BSW", uses: "Learn bone structure, joints, and body support." },
-  { subject: "Biology", name: "Neuron model", image: "https://visionempowertrust.org/arc/wp-content/uploads/Neuron.jpeg", video: "https://youtu.be/vy0s6aEOEfg", supplier: "Labkafe", uses: "Explore neuron parts and signal transmission." },
-  { subject: "Biology", name: "Plant cell", image: "https://visionempowertrust.org/arc/wp-content/uploads/Plant-Cell.jpeg", video: "", supplier: "Labkafe", uses: "Compare plant and animal cells through tactile features." },
-  { subject: "Chemistry", name: "Analytical funnel", image: "https://visionempowertrust.org/arc/wp-content/uploads/Analytical-funnel.webp", video: "", supplier: "Labkafe", uses: "Pour liquids safely and discuss filtration setups." },
-  { subject: "Chemistry", name: "Atomic model", image: "https://visionempowertrust.org/arc/wp-content/uploads/atomic-model.webp", video: "", supplier: "Labkafe", uses: "Represent atoms, shells, and bonding ideas in 3D." },
-  { subject: "Chemistry", name: "Beaker 100 ml", image: "https://visionempowertrust.org/arc/wp-content/uploads/Beaker-100-ml.webp", video: "", supplier: "Labkafe", uses: "Measure, mix, and hold liquids during experiments." },
-  { subject: "Chemistry", name: "Interactive Periodic table", image: "https://visionempowertrust.org/arc/wp-content/uploads/interactive-periodic-table.webp", video: "", supplier: "Labkafe", uses: "Navigate elements, groups, and periodic trends accessibly." },
-  { subject: "Chemistry", name: "Measuring cylinder", image: "https://visionempowertrust.org/arc/wp-content/uploads/Measuring-cylinder.webp", video: "", supplier: "Labkafe", uses: "Practice volume measurement and meniscus concepts." },
-  { subject: "Chemistry", name: "Microlit Lab Micropipette", image: "https://visionempowertrust.org/arc/wp-content/uploads/Microlit-Lab-Micropipette.webp", video: "https://youtu.be/KiNNHbiVVyQ", supplier: "Microlit", uses: "Transfer small liquid volumes with controlled precision." },
-  { subject: "Physics", name: "Resonance Bar", image: "https://visionempowertrust.org/arc/wp-content/uploads/Resonance-Bar.webp", video: "https://youtu.be/UtpMtJAI8jM?si=Cn4l--VNiykBXC1b", supplier: "Kallingal Distributors", uses: "Demonstrate resonance and vibration behavior." },
-  { subject: "Physics", name: "See Saw", image: "https://visionempowertrust.org/arc/wp-content/uploads/See-%E2%80%93-Saw.webp", video: "https://youtu.be/pJN4_7mADEU?si=8Vuuq6iUZOlxAAM4", supplier: "Kallingal Distributors", uses: "Explore levers, balance, torque, and fulcrum position." },
-  { subject: "Physics", name: "Simple Pendulum", image: "https://visionempowertrust.org/arc/wp-content/uploads/Simple-Pendulum.webp", video: "", supplier: "Kallingal Distributors", uses: "Observe oscillation, period, length, and gravity effects." },
-  { subject: "Physics", name: "Solar system", image: "https://visionempowertrust.org/arc/wp-content/uploads/solar-system.webp", video: "", supplier: "Bharath scientific world", uses: "Understand planetary order, scale, and orbital ideas." },
-  { subject: "Physics", name: "Sprinkler", image: "https://visionempowertrust.org/arc/wp-content/uploads/Sprinkler.webp", video: "https://youtu.be/1gNJjv2-mYU?si=DDu0OUKBQBjP_9j4", supplier: "Kallingal Distributors", uses: "Connect rotation to fluid pressure and Newton's laws." },
-  { subject: "Physics", name: "Static Inertia", image: "https://visionempowertrust.org/arc/wp-content/uploads/Static-Inertia.webp", video: "https://youtu.be/pdLY8E3y-gc?si=0Nt7Ij0SD8Fo-koD", supplier: "Kallingal Distributors", uses: "Demonstrate inertia and resistance to change in motion." },
-  { subject: "Physics", name: "Thermal Expansion (Gas)", image: "https://visionempowertrust.org/arc/wp-content/uploads/Thermal-Expansion-Gas.webp", video: "https://youtu.be/R8plkCBPbBU?si=VLGEq_t7b4YsNs8-", supplier: "Kallingal Distributors", uses: "Observe gas expansion when heated." },
-  { subject: "Physics", name: "Water Maintains Level", image: "", video: "https://youtu.be/nt4lMJDQbGM?si=d8eu4huhgDzM8N4Q", supplier: "Kallingal Distributors", uses: "Show communicating vessels and equal liquid levels." }
-].map((resource) => ({
-  id: makeId("res"),
+const fallbackResources = [
+  { id: "res-fallback-1", subject: "Assistive Technologies", name: "Annie", image: "", video: "", supplier: "Thinkerbell", uses: "Braille literacy and independent practice for early learners.", tags: [] },
+  { id: "res-fallback-2", subject: "Physics", name: "See Saw", image: "https://visionempowertrust.org/arc/wp-content/uploads/See-%E2%80%93-Saw.webp", video: "https://youtu.be/pJN4_7mADEU?si=8Vuuq6iUZOlxAAM4", supplier: "Kallingal Distributors", uses: "Explore levers, balance, torque, and fulcrum position.", tags: [] }
+];
+const registryResources = Array.isArray(window.ARC_RESOURCES) ? window.ARC_RESOURCES : fallbackResources;
+const seedResources = registryResources.map((resource, index) => ({
+  id: resource.id || makeId("res"),
   tags: [],
-  ...resource
+  ...resource,
+  subject: normalizeResourceCategory(resource.subject),
+  uses: resource.uses || defaultUses(resource.subject, resource.name),
+  sortOrder: index
 }));
 
 let state = loadState();
@@ -64,6 +42,7 @@ const manualForm = document.querySelector("#manual-form");
 const importForm = document.querySelector("#import-form");
 const resourceDialog = document.querySelector("#resource-dialog");
 const manualDialog = document.querySelector("#manual-dialog");
+const manualDetailsDialog = document.querySelector("#manual-details-dialog");
 const importDialog = document.querySelector("#import-dialog");
 
 document.querySelectorAll("[data-view-button]").forEach((button) => {
@@ -114,20 +93,7 @@ function loadState() {
 
   return {
     resources: seedResources,
-    manuals: [
-      {
-        id: makeId("man"),
-        name: "Exploring balance with a see saw",
-        subject: "Physics",
-        objective: "Understand how distance from the fulcrum changes balance.",
-        resourceIds: seedResources.filter((item) => item.name === "See Saw").map((item) => item.id),
-        otherResources: "Equal weights, string, and a stable table surface.",
-        steps: "Place equal weights on both sides. Move one weight closer to the fulcrum. Move the other weight farther away. Compare the balance after each change.",
-        observations: "The side farther from the fulcrum can go down even with the same weight.",
-        inferences: "Balance depends on both weight and distance from the fulcrum.",
-        concepts: "TIK: lever, fulcrum, torque, balance"
-      }
-    ]
+    manuals: seedManuals(seedResources)
   };
 }
 
@@ -143,6 +109,159 @@ function migrateState(parsed) {
       ...manual
     }))
   };
+}
+
+function seedManuals(resources) {
+  const pick = (...needles) => resources
+    .filter((resource) => needles.some((needle) => resource.name.toLowerCase().includes(needle.toLowerCase())))
+    .map((resource) => resource.id);
+
+  return [
+    {
+      id: "manual-lever-balance",
+      subject: "Physics",
+      name: "Balance and levers with a see saw",
+      objective: "Explore how distance from the fulcrum changes balance.",
+      resourceIds: pick("See Saw", "Lever System"),
+      otherResources: "Equal weights, tactile markers, and a stable table surface.",
+      steps: "Place equal weights on both sides of the see saw. Move one weight closer to the fulcrum. Move the other weight farther away. Compare how each position changes balance.",
+      observations: "The side farther from the fulcrum can go down even when the weights are equal.",
+      inferences: "A lever balances based on both weight and distance from the fulcrum.",
+      concepts: "TIK: lever, fulcrum, force, distance, torque"
+    },
+    {
+      id: "manual-pendulum-motion",
+      subject: "Physics",
+      name: "Counting swings with a simple pendulum",
+      objective: "Observe periodic motion and compare swing time for different lengths.",
+      resourceIds: pick("Simple Pendulum"),
+      otherResources: "Stopwatch or talking timer.",
+      steps: "Set the pendulum to a short length and count ten swings. Repeat with a longer length. Keep the release angle small each time.",
+      observations: "The longer pendulum takes more time for the same number of swings.",
+      inferences: "The time period of a pendulum depends mainly on its length.",
+      concepts: "TIK: periodic motion, time period, length, fair test"
+    },
+    {
+      id: "manual-circuit-path",
+      subject: "Physics",
+      name: "Tracing a closed electric circuit",
+      objective: "Identify the path needed for current to flow in a simple circuit.",
+      resourceIds: pick("Circuit board", "Electrical bell model", "Conductivity"),
+      otherResources: "Battery cells and connecting wires if not included in the kit.",
+      steps: "Trace each connection by touch. Close the circuit and observe the output. Open one connection and observe what changes.",
+      observations: "The output works only when the path is complete.",
+      inferences: "Electric current needs a closed conducting path.",
+      concepts: "TIK: circuit, conductor, open circuit, closed circuit"
+    },
+    {
+      id: "manual-cell-comparison",
+      subject: "Biology",
+      name: "Comparing plant and animal cells",
+      objective: "Compare the tactile features of plant and animal cells.",
+      resourceIds: pick("Plant cell", "Animal cell"),
+      otherResources: "Braille labels or tactile sticky markers.",
+      steps: "Explore the outline of each model. Locate the nucleus and other major parts. Compare the outer boundary and internal structures.",
+      observations: "The plant cell has a more regular outer boundary and distinct features that differ from the animal cell.",
+      inferences: "Plant and animal cells share some parts but also have structures that support different functions.",
+      concepts: "TIK: cell, organelle, cell wall, nucleus, comparison"
+    },
+    {
+      id: "manual-heart-flow",
+      subject: "Biology",
+      name: "Tracing blood flow through the heart",
+      objective: "Understand the main chambers and direction of blood flow in the heart.",
+      resourceIds: pick("Human heart"),
+      otherResources: "Tactile arrows or pipe cleaners for marking direction.",
+      steps: "Identify the chambers by touch. Place tactile arrows to show the route through the heart. Explain the path aloud in order.",
+      observations: "The heart has separate spaces and one-way routes for blood movement.",
+      inferences: "The heart pumps blood in an organized path through chambers and vessels.",
+      concepts: "TIK: chamber, valve, blood flow, circulation, sequence"
+    },
+    {
+      id: "manual-eye-parts",
+      subject: "Biology",
+      name: "Identifying parts of the human eye",
+      objective: "Recognize the major parts of the eye and connect each part to its function.",
+      resourceIds: pick("Human eye"),
+      otherResources: "Braille labels for cornea, lens, retina, and optic nerve.",
+      steps: "Explore the model from front to back. Label each major part. Discuss how light travels through the parts.",
+      observations: "The eye has curved, layered parts arranged in a clear order.",
+      inferences: "Each part of the eye has a role in focusing light and sending information to the brain.",
+      concepts: "TIK: lens, retina, optic nerve, light, function"
+    },
+    {
+      id: "manual-measuring-volume",
+      subject: "Chemistry",
+      name: "Measuring liquid volume",
+      objective: "Practice choosing and using common lab containers for volume measurement.",
+      resourceIds: pick("Measuring cylinder", "Beaker 100 ml", "Beaker 250 ml", "Analytical funnel"),
+      otherResources: "Water and a tray to catch spills.",
+      steps: "Explore the shape of each container. Pour water into the beaker. Transfer it to the measuring cylinder. Compare approximate and measured volume.",
+      observations: "A beaker is useful for holding liquid, while the measuring cylinder gives a clearer volume reading.",
+      inferences: "Different lab containers are designed for different levels of measurement accuracy.",
+      concepts: "TIK: volume, measurement, apparatus, accuracy"
+    },
+    {
+      id: "manual-atomic-structure",
+      subject: "Chemistry",
+      name: "Building an atom model",
+      objective: "Use a tactile model to identify nucleus, electrons, and shells.",
+      resourceIds: pick("Atomic model", "Interactive Periodic table"),
+      otherResources: "Small tactile counters for protons, neutrons, and electrons.",
+      steps: "Explore the atomic model. Identify the center and outer shells. Use the periodic table to choose an element and represent its particles.",
+      observations: "Particles are arranged in a central nucleus and outer regions.",
+      inferences: "Atoms have internal structure, and different elements have different particle counts.",
+      concepts: "TIK: atom, nucleus, electron, shell, element"
+    },
+    {
+      id: "manual-geometry-shapes",
+      subject: "Maths",
+      name: "Exploring tactile geometry",
+      objective: "Identify shapes and compare sides, corners, and symmetry.",
+      resourceIds: pick("Tactile Mathematics Primer", "Encyclopedia of Geometry", "DIY Kit for graphs"),
+      otherResources: "String, tactile graph sheet, or raised-line drawing board.",
+      steps: "Choose two shapes from the tactile material. Count sides and corners. Fold or trace a line of symmetry where possible. Compare the shapes.",
+      observations: "Shapes can be identified by the number of sides, corners, and symmetry lines.",
+      inferences: "Geometry properties help classify and describe shapes.",
+      concepts: "TIK: shape, side, corner, symmetry, classification"
+    },
+    {
+      id: "manual-graph-reading",
+      subject: "Maths",
+      name: "Reading a tactile graph",
+      objective: "Interpret a simple raised-line graph using axes and plotted points.",
+      resourceIds: pick("DIY Kit for graphs", "Tactile Mathematics Primer"),
+      otherResources: "Small tactile stickers for marking data points.",
+      steps: "Find the x-axis and y-axis. Mark three points. Trace the line or pattern between the points and describe the trend.",
+      observations: "The position of each point depends on two values.",
+      inferences: "Graphs show relationships between quantities in a compact form.",
+      concepts: "TIK: axis, point, value, trend, coordinate"
+    },
+    {
+      id: "manual-assistive-reading",
+      subject: "Assistive Technologies",
+      name: "Independent reading with assistive technology",
+      objective: "Use assistive technology to access written or digital information.",
+      resourceIds: pick("Annie", "IRIS", "Uread", "Tactograph"),
+      otherResources: "A short grade-level reading passage.",
+      steps: "Explore the controls of the device. Load or select the reading material. Read a short section and summarize it aloud.",
+      observations: "The learner can access text through braille, audio, or tactile support depending on the tool.",
+      inferences: "Assistive technology supports independent access to STEM information.",
+      concepts: "TIK: access, independence, braille, audio, digital literacy"
+    },
+    {
+      id: "manual-day-night",
+      subject: "Basic Science",
+      name: "Modeling day and night",
+      objective: "Understand how rotation creates day and night.",
+      resourceIds: pick("Day And Night Demonstrator", "Solar system"),
+      otherResources: "A lamp or safe light source if the kit needs one.",
+      steps: "Identify the Earth model and light source. Rotate the Earth slowly. Notice which side faces the light and which side is away from it.",
+      observations: "One side receives light while the opposite side remains away from the light.",
+      inferences: "Day and night happen because Earth rotates.",
+      concepts: "TIK: rotation, light, shadow, day, night"
+    }
+  ];
 }
 
 function persist() {
@@ -299,6 +418,9 @@ function renderManuals() {
   manualList.querySelectorAll("[data-delete-manual]").forEach((button) => {
     button.addEventListener("click", () => deleteManual(button.dataset.deleteManual));
   });
+  manualList.querySelectorAll("[data-show-manual]").forEach((button) => {
+    button.addEventListener("click", () => openManualDetails(button.dataset.showManual));
+  });
   manualList.querySelectorAll("[data-resource-link]").forEach((link) => {
     link.addEventListener("click", (event) => {
       event.preventDefault();
@@ -327,6 +449,53 @@ function manualCard(manual) {
       </div>
     </article>
   `;
+}
+
+function manualCard(manual) {
+  const resources = resourcesForManual(manual);
+  return `
+    <article class="manual-card">
+      <div class="manual-dashboard-row">
+        <div>
+          <p class="eyebrow manual-subject-label">${escapeHtml(manual.subject || "Subject not set")}</p>
+          <h3>${escapeHtml(manual.name)}</h3>
+          <p class="meta">${resources.length} linked resource${resources.length === 1 ? "" : "s"}</p>
+        </div>
+        <button class="primary" type="button" data-show-manual="${manual.id}">More Details</button>
+      </div>
+      <div class="card-actions">
+        <button type="button" data-edit-manual="${manual.id}">Edit</button>
+        <button class="danger" type="button" data-delete-manual="${manual.id}">Delete</button>
+      </div>
+    </article>
+  `;
+}
+
+function openManualDetails(id) {
+  const manual = state.manuals.find((item) => item.id === id);
+  if (!manual) return;
+  const resources = resourcesForManual(manual);
+  document.querySelector("#manual-details-title").textContent = manual.name;
+  document.querySelector("#manual-details-content").innerHTML = `
+    <div class="manual-details-summary">
+      <p><strong>Subject:</strong> ${escapeHtml(manual.subject || "Subject not set")}</p>
+      <p><strong>Topic:</strong> ${escapeHtml(manual.name)}</p>
+    </div>
+    ${manualSection("Objective: What we have to do?", manual.objective)}
+    ${manualResourcesSection(resources, manual.otherResources)}
+    ${manualSection("Steps: How do we proceed?", manual.steps)}
+    ${manualSection("Observations: What do we observe?", manual.observations)}
+    ${manualSection("Inferences: What do we conclude?", manual.inferences)}
+    ${manualSection("Concepts: (TIK)", manual.concepts)}
+  `;
+  document.querySelectorAll("#manual-details-content [data-resource-link]").forEach((link) => {
+    link.addEventListener("click", (event) => {
+      event.preventDefault();
+      manualDetailsDialog.close();
+      focusResource(link.dataset.resourceLink);
+    });
+  });
+  manualDetailsDialog.showModal();
 }
 
 function manualResourcesSection(resources, otherResources) {
@@ -503,6 +672,33 @@ function parseArcTable(html) {
     .filter(Boolean);
 }
 
+function parseRegistryJson(registry) {
+  return registry.data.slice(1).map((row, index) => {
+    const subject = normalizeResourceCategory(htmlToText(row[0]));
+    const name = htmlToText(row[1]);
+    return {
+      id: `res-import-${Date.now()}-${index}`,
+      subject,
+      name,
+      image: firstHref(row[2]),
+      video: firstHref(row[3]),
+      supplier: htmlToText(row[4]).replace(/^-$/, ""),
+      uses: defaultUses(subject, name),
+      tags: []
+    };
+  }).filter((resource) => resource.name);
+}
+
+function htmlToText(value = "") {
+  const doc = new DOMParser().parseFromString(String(value), "text/html");
+  return doc.body.textContent.trim();
+}
+
+function firstHref(value = "") {
+  const doc = new DOMParser().parseFromString(String(value), "text/html");
+  return doc.querySelector("a")?.href || "";
+}
+
 function importJson(event) {
   const file = event.target.files[0];
   if (!file) return;
@@ -511,6 +707,7 @@ function importJson(event) {
     try {
       const parsed = JSON.parse(reader.result);
       if (Array.isArray(parsed.resources)) mergeResources(parsed.resources);
+      if (Array.isArray(parsed.data)) mergeResources(parseRegistryJson(parsed));
       if (Array.isArray(parsed.manuals)) state.manuals = dedupeByName([...state.manuals, ...parsed.manuals], "manual");
       if (Array.isArray(parsed) && parsed.every((item) => item.name)) mergeResources(parsed);
       persist();
@@ -600,8 +797,9 @@ function uniqueSubjects() {
 function resourceMatchesManualSubject(resource, manualSubject) {
   const resourceSubject = normalizeResourceCategory(resource.subject || "").toLowerCase();
   const resourceTags = (resource.tags || []).join(" ").toLowerCase();
-  const text = `${resourceSubject} ${resourceTags}`;
-  if (manualSubject === "Assistive Technologies Use") {
+  const resourceName = (resource.name || "").toLowerCase();
+  const text = `${resourceSubject} ${resourceName} ${resourceTags}`;
+  if (manualSubject === "Assistive Technologies") {
     return text.includes("assistive");
   }
   if (manualSubject === "Maths") {
@@ -617,7 +815,7 @@ function normalizeResourceCategory(subject = "") {
   const value = String(subject).trim();
   const lower = value.toLowerCase();
   if (!value) return "Basic Science";
-  if (lower === "at" || lower.includes("assistive")) return "Assistive Technologies Use";
+  if (lower === "at" || lower.includes("assistive")) return "Assistive Technologies";
   if (lower === "ct and stem" || lower.includes("computational") || lower === "ct") return "Computational Thinking (CT)";
   if (lower === "math" || lower === "maths" || lower.includes("mathematics")) return "Maths";
   if (lower.includes("basic science")) return "Basic Science";

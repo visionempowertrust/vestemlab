@@ -161,7 +161,7 @@
         </div>
         <input type="hidden" name="id">
         <label>
-          Name
+          Topic
           <input name="name" required>
         </label>
         <label>
@@ -227,7 +227,18 @@
       <span id="toast" role="status" aria-live="polite"></span>
     </div>
 
+    <dialog id="manual-details-dialog" aria-labelledby="manual-details-title">
+      <div class="editor">
+        <div class="dialog-head">
+          <h3 id="manual-details-title">Manual details</h3>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Close manual details">x</button>
+        </div>
+        <div id="manual-details-content"></div>
+      </div>
+    </dialog>
+
     <datalist id="subject-options"></datalist>
+    <script src="data/resources-data.js"></script>
     <script src="app.js"></script>
   </body>
 </html>
