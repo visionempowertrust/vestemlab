@@ -678,6 +678,10 @@ dialog::backdrop {
   text-align: center;
 }
 
+.details-table-wrap {
+  margin-top: 1rem;
+}
+
 .attendance-panel {
   display: grid;
   gap: 1rem;

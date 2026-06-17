@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dashboard | Vision Empower STEM Lab</title>
+    <meta
+      name="description"
+      content="Student science lab attendance dashboard for the Vision Empower Accessible STEM Lab portal."
+    >
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <header class="site-header">
+      <div class="shell header-grid">
+        <div class="brand-lockup">
+          <a href="index.html" aria-label="Accessible STEM Lab Portal home">
+            <img class="brand-logo" src="assets/vision-empower-logo.png" alt="Vision Empower">
+          </a>
+          <h1>Accessible STEM Lab Portal</h1>
+        </div>
+        <nav aria-label="Primary">
+          <a class="nav-tab nav-link-tab" href="index.html">Home</a>
+          <a class="nav-tab nav-link-tab" href="index.html#resources-view">Resources</a>
+          <a class="nav-tab nav-link-tab" href="index.html#manuals-view">Manuals</a>
+          <a class="nav-tab nav-link-tab" href="students.html">Students</a>
+          <a class="nav-tab nav-link-tab" href="session-entry.html">Session Entry</a>
+          <a class="nav-tab nav-link-tab is-active" href="dashboard.html">Dashboard</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main" class="students-page">
+      <section class="shell section-head">
+        <div>
+          <p class="eyebrow">Dashboard</p>
+          <h2>Student lab sessions</h2>
+          <p class="lede">Review each student's science lab attendance and open session-level details.</p>
+        </div>
+        <span id="dashboard-status" class="status-pill" role="status" aria-live="polite">Ready</span>
+      </section>
+
+      <section class="shell content-stack">
+        <div class="panel filters horizontal-filters dashboard-filters" aria-label="Dashboard filters">
+          <label>
+            Search
+            <input id="dashboard-search" type="search" placeholder="Student, state, school">
+          </label>
+          <label>
+            State
+            <select id="dashboard-state-filter"></select>
+          </label>
+          <label>
+            School
+            <select id="dashboard-school-filter"></select>
+          </label>
+        </div>
+
+        <div class="stat-strip" aria-label="Dashboard summary">
+          <div><strong id="dashboard-student-count">0</strong><span>students</span></div>
+          <div><strong id="dashboard-session-count">0</strong><span>saved sessions</span></div>
+          <div><strong id="dashboard-attendance-count">0</strong><span>attendances</span></div>
+        </div>
+
+        <section class="panel student-list-panel" aria-labelledby="student-dashboard-heading">
+          <div class="section-heading-inline">
+            <h3 id="student-dashboard-heading">Student records</h3>
+            <span id="dashboard-row-count" class="meta">0 records</span>
+          </div>
+          <div class="resource-table-wrap">
+            <table class="resource-table students-table">
+              <thead>
+                <tr>
+                  <th scope="col">State</th>
+                  <th scope="col">School</th>
+                  <th scope="col">Student name</th>
+                  <th scope="col">Lab sessions attended</th>
+                  <th scope="col">More Details</th>
+                </tr>
+              </thead>
+              <tbody id="dashboard-table"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <dialog id="student-details-dialog" aria-labelledby="student-details-title">
+      <div class="editor">
+        <div class="dialog-head">
+          <h3 id="student-details-title">Student details</h3>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Close student details">x</button>
+        </div>
+        <div id="student-details-content"></div>
+      </div>
+    </dialog>
+
+    <script src="dashboard.js"></script>
+  </body>
+</html>
