@@ -39,12 +39,10 @@ const resourceList = document.querySelector("#resource-list");
 const manualList = document.querySelector("#manual-list");
 const resourceForm = document.querySelector("#resource-form");
 const manualForm = document.querySelector("#manual-form");
-const importForm = document.querySelector("#import-form");
 const resourceDialog = document.querySelector("#resource-dialog");
 const resourceDetailsDialog = document.querySelector("#resource-details-dialog");
 const manualDialog = document.querySelector("#manual-dialog");
 const manualDetailsDialog = document.querySelector("#manual-details-dialog");
-const importDialog = document.querySelector("#import-dialog");
 
 document.querySelectorAll("[data-view-button]").forEach((button) => {
   button.addEventListener("click", () => setView(button.dataset.viewButton));
@@ -52,8 +50,6 @@ document.querySelectorAll("[data-view-button]").forEach((button) => {
 
 document.querySelector("[data-open-resource-form]").addEventListener("click", () => openResourceForm());
 document.querySelector("[data-open-manual-form]").addEventListener("click", () => openManualForm());
-document.querySelector("[data-open-import]").addEventListener("click", () => importDialog.showModal());
-document.querySelector("[data-reset-seed]").addEventListener("click", resetSeed);
 document.querySelector("#resource-search").addEventListener("input", render);
 document.querySelector("#subject-filter").addEventListener("change", render);
 document.querySelector("#media-filter").addEventListener("change", render);
@@ -63,7 +59,6 @@ document.querySelector("#manual-subject-filter").addEventListener("change", rend
 document.querySelector("#manual-subject").addEventListener("change", () => {
   renderManualResourcePicker([], manualForm.elements.subject.value);
 });
-document.querySelector("#json-import").addEventListener("change", importJson);
 
 document.querySelectorAll("[data-close-dialog]").forEach((button) => {
   button.addEventListener("click", () => button.closest("dialog").close());
@@ -75,7 +70,6 @@ document.querySelectorAll("[data-export]").forEach((button) => {
 
 resourceForm.addEventListener("submit", saveResource);
 manualForm.addEventListener("submit", saveManual);
-importForm.addEventListener("submit", importArcHtml);
 
 render();
 
@@ -651,97 +645,6 @@ function deleteManual(id) {
   render();
 }
 
-function importArcHtml(event) {
-  event.preventDefault();
-  const html = new FormData(importForm).get("html");
-  const resources = parseArcTable(html);
-  if (!resources.length) {
-    toast("No ARC rows found");
-    return;
-  }
-
-  mergeResources(resources);
-  persist();
-  importDialog.close();
-  importForm.reset();
-  toast(`${resources.length} resources imported`);
-  render();
-}
-
-function parseArcTable(html) {
-  const doc = new DOMParser().parseFromString(html, "text/html");
-  return [...doc.querySelectorAll("tr")]
-    .map((row) => {
-      const cells = [...row.querySelectorAll("td")];
-      if (cells.length < 5) return null;
-      const image = cells[2].querySelector("a")?.href || "";
-      const video = cells[3].querySelector("a")?.href || "";
-      const name = cells[1].textContent.trim();
-      if (!name) return null;
-      return {
-        id: makeId("res"),
-        subject: normalizeResourceCategory(cells[0].textContent.trim()),
-        name,
-        image,
-        video,
-        supplier: cells[4].textContent.trim(),
-        uses: defaultUses(cells[0].textContent.trim(), name),
-        tags: []
-      };
-    })
-    .filter(Boolean);
-}
-
-function parseRegistryJson(registry) {
-  return registry.data.slice(1).map((row, index) => {
-    const subject = normalizeResourceCategory(htmlToText(row[0]));
-    const name = htmlToText(row[1]);
-    return {
-      id: `res-import-${Date.now()}-${index}`,
-      subject,
-      name,
-      image: firstHref(row[2]),
-      video: firstHref(row[3]),
-      supplier: htmlToText(row[4]).replace(/^-$/, ""),
-      uses: defaultUses(subject, name),
-      tags: []
-    };
-  }).filter((resource) => resource.name);
-}
-
-function htmlToText(value = "") {
-  const doc = new DOMParser().parseFromString(String(value), "text/html");
-  return doc.body.textContent.trim();
-}
-
-function firstHref(value = "") {
-  const doc = new DOMParser().parseFromString(String(value), "text/html");
-  return doc.querySelector("a")?.href || "";
-}
-
-function importJson(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.addEventListener("load", () => {
-    try {
-      const parsed = JSON.parse(reader.result);
-      if (Array.isArray(parsed.resources)) mergeResources(parsed.resources);
-      if (Array.isArray(parsed.data)) mergeResources(parseRegistryJson(parsed));
-      if (Array.isArray(parsed.manuals)) state.manuals = dedupeByName([...state.manuals, ...parsed.manuals], "manual");
-      if (Array.isArray(parsed) && parsed.every((item) => item.name)) mergeResources(parsed);
-      persist();
-      toast("JSON imported");
-      render();
-    } catch {
-      toast("Could not read JSON");
-    } finally {
-      event.target.value = "";
-    }
-  });
-  reader.readAsText(file);
-}
-
 function exportJson(type) {
   const payload = type === "resources" ? { resources: state.resources } : { manuals: state.manuals };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
@@ -751,14 +654,6 @@ function exportJson(type) {
   anchor.click();
   URL.revokeObjectURL(anchor.href);
   toast(`${type} exported`);
-}
-
-function resetSeed() {
-  if (!confirm("Reload starter seed resources? Existing resources with the same name and subject will be updated.")) return;
-  mergeResources(seedResources.map((resource) => ({ ...resource, id: makeId("res") })));
-  persist();
-  toast("Starter seed loaded");
-  render();
 }
 
 function mergeResources(resources) {

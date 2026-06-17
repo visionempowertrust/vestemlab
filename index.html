@@ -61,7 +61,6 @@
                 <option value="both">With image and video</option>
               </select>
             </label>
-            <button type="button" data-reset-seed>Reload starter seed</button>
           </div>
 
           <div class="stat-strip" aria-label="Resource summary">
@@ -211,27 +210,7 @@
       </form>
     </dialog>
 
-    <dialog id="import-dialog" aria-labelledby="import-dialog-title">
-      <form id="import-form" method="dialog" class="editor">
-        <div class="dialog-head">
-          <h3 id="import-dialog-title">Import ARC table HTML</h3>
-          <button class="icon-button" type="button" data-close-dialog aria-label="Close import form">x</button>
-        </div>
-        <p class="hint">Paste the table HTML from the ARC STEM Lab Materials page to import all rows into this local catalogue.</p>
-        <textarea name="html" rows="10" required></textarea>
-        <div class="dialog-actions">
-          <button type="button" data-close-dialog>Cancel</button>
-          <button class="primary" type="submit">Import resources</button>
-        </div>
-      </form>
-    </dialog>
-
     <div class="shell utility-bar">
-      <button type="button" data-open-import>Import ARC table HTML</button>
-      <label class="file-button">
-        Import JSON
-        <input id="json-import" type="file" accept="application/json">
-      </label>
       <span id="toast" role="status" aria-live="polite"></span>
     </div>
 
