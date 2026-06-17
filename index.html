@@ -42,8 +42,8 @@
           </div>
         </div>
 
-        <div class="shell layout">
-          <aside class="panel filters" aria-label="Resource filters">
+        <div class="shell content-stack">
+          <div class="panel filters horizontal-filters" aria-label="Resource filters">
             <label>
               Search resources
               <input id="resource-search" type="search" placeholder="Name, use, supplier">
@@ -62,16 +62,14 @@
               </select>
             </label>
             <button type="button" data-reset-seed>Reload starter seed</button>
-          </aside>
-
-          <div class="content-stack">
-            <div class="stat-strip" aria-label="Resource summary">
-              <div><strong id="resource-count">0</strong><span>resources</span></div>
-              <div><strong id="manual-linked-count">0</strong><span>used in manuals</span></div>
-              <div><strong id="subject-count">0</strong><span>categories</span></div>
-            </div>
-            <div id="resource-list" class="resource-grid" aria-live="polite"></div>
           </div>
+
+          <div class="stat-strip" aria-label="Resource summary">
+            <div><strong id="resource-count">0</strong><span>resources</span></div>
+            <div><strong id="manual-linked-count">0</strong><span>used in manuals</span></div>
+            <div><strong id="subject-count">0</strong><span>categories</span></div>
+          </div>
+          <div id="resource-list" class="resource-grid" aria-live="polite"></div>
         </div>
       </section>
 

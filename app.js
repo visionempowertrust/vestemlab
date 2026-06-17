@@ -372,7 +372,7 @@ function resourceRow(resource) {
       <td data-label="Supplier">${escapeHtml(resource.supplier || "Supplier not listed")}</td>
       <td data-label="More Actions">
         <div class="table-actions">
-          <button type="button" data-show-resource="${resource.id}">Show Details</button>
+          <button type="button" data-show-resource="${resource.id}">Details</button>
           <button type="button" data-edit-resource="${resource.id}">Edit</button>
         </div>
       </td>

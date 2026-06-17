@@ -224,6 +224,19 @@ dialog {
   padding: 1rem;
 }
 
+.horizontal-filters {
+  position: static;
+  display: grid;
+  grid-template-columns: minmax(220px, 2fr) minmax(180px, 1fr) minmax(180px, 1fr) auto;
+  gap: 1rem;
+  align-items: end;
+}
+
+.horizontal-filters label,
+.horizontal-filters button {
+  margin-top: 0;
+}
+
 label {
   display: grid;
   gap: 0.35rem;
@@ -319,9 +332,16 @@ textarea {
 }
 
 .table-actions {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(72px, 1fr));
   gap: 0.5rem;
+  align-items: center;
+  min-width: 160px;
+}
+
+.table-actions button {
+  min-height: 38px;
+  padding-inline: 0.7rem;
 }
 
 .resource-detail-grid {
@@ -571,6 +591,10 @@ dialog::backdrop {
     position: static;
   }
 
+  .horizontal-filters {
+    grid-template-columns: 1fr;
+  }
+
   .stat-strip,
   .form-grid {
     grid-template-columns: 1fr;
@@ -616,6 +640,11 @@ dialog::backdrop {
     font-size: 0.78rem;
     font-weight: 800;
     text-transform: uppercase;
+  }
+
+  .table-actions {
+    min-width: 0;
+    width: 100%;
   }
 
   .resource-detail-grid {
