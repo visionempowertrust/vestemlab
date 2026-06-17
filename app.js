@@ -331,6 +331,9 @@ function renderResources() {
   resourceList.querySelectorAll("[data-edit-resource]").forEach((button) => {
     button.addEventListener("click", () => openResourceForm(button.dataset.editResource));
   });
+  resourceList.querySelectorAll("[data-delete-resource]").forEach((button) => {
+    button.addEventListener("click", () => deleteResource(button.dataset.deleteResource));
+  });
   resourceList.querySelectorAll("[data-show-resource]").forEach((button) => {
     button.addEventListener("click", () => openResourceDetails(button.dataset.showResource));
   });
@@ -368,6 +371,7 @@ function resourceRow(resource) {
         <div class="table-actions">
           <button type="button" data-show-resource="${resource.id}">Details</button>
           <button type="button" data-edit-resource="${resource.id}">Edit</button>
+          <button class="danger" type="button" data-delete-resource="${resource.id}">Delete</button>
         </div>
       </td>
     </tr>
@@ -423,7 +427,7 @@ function renderManuals() {
     });
 
   manualList.innerHTML = manuals.length
-    ? manuals.map(manualCard).join("")
+    ? manualTable(manuals)
     : `<div class="empty-state">No manuals yet. Add a manual to document an activity or experiment.</div>`;
 
   manualList.querySelectorAll("[data-edit-manual]").forEach((button) => {
@@ -443,45 +447,42 @@ function renderManuals() {
   });
 }
 
-function manualCard(manual) {
-  const resources = resourcesForManual(manual);
+
+function manualTable(manuals) {
   return `
-    <article class="manual-card">
-      <div>
-        <h3>${escapeHtml(manual.name)}</h3>
-        <p class="meta">${escapeHtml(manual.subject || "Subject not set")} · ${resources.length} linked resource${resources.length === 1 ? "" : "s"}</p>
-      </div>
-      ${manualSection("Objective: What we have to do?", manual.objective)}
-      ${manualResourcesSection(resources, manual.otherResources)}
-      ${manualSection("Steps: How do we proceed?", manual.steps)}
-      ${manualSection("Observations: What do we observe?", manual.observations)}
-      ${manualSection("Inferences: What do we conclude?", manual.inferences)}
-      ${manualSection("Concepts: (TIK)", manual.concepts)}
-      <div class="card-actions">
-        <button type="button" data-edit-manual="${manual.id}">Edit</button>
-        <button class="danger" type="button" data-delete-manual="${manual.id}">Delete</button>
-      </div>
-    </article>
+    <div class="resource-table-wrap">
+      <table class="resource-table">
+        <thead>
+          <tr>
+            <th scope="col">Subject</th>
+            <th scope="col">Topic</th>
+            <th scope="col">Resources</th>
+            <th scope="col">More Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${manuals.map(manualRow).join("")}
+        </tbody>
+      </table>
+    </div>
   `;
 }
 
-function manualCard(manual) {
+function manualRow(manual) {
   const resources = resourcesForManual(manual);
   return `
-    <article class="manual-card">
-      <div class="manual-dashboard-row">
-        <div>
-          <p class="eyebrow manual-subject-label">${escapeHtml(manual.subject || "Subject not set")}</p>
-          <h3>${escapeHtml(manual.name)}</h3>
-          <p class="meta">${resources.length} linked resource${resources.length === 1 ? "" : "s"}</p>
+    <tr>
+      <td data-label="Subject">${escapeHtml(manual.subject || "Subject not set")}</td>
+      <td data-label="Topic"><strong>${escapeHtml(manual.name)}</strong></td>
+      <td data-label="Resources">${resources.length} linked resource${resources.length === 1 ? "" : "s"}</td>
+      <td data-label="More Actions">
+        <div class="table-actions">
+          <button type="button" data-show-manual="${manual.id}">Details</button>
+          <button type="button" data-edit-manual="${manual.id}">Edit</button>
+          <button class="danger" type="button" data-delete-manual="${manual.id}">Delete</button>
         </div>
-        <button class="primary" type="button" data-show-manual="${manual.id}">More Details</button>
-      </div>
-      <div class="card-actions">
-        <button type="button" data-edit-manual="${manual.id}">Edit</button>
-        <button class="danger" type="button" data-delete-manual="${manual.id}">Delete</button>
-      </div>
-    </article>
+      </td>
+    </tr>
   `;
 }
 

@@ -227,7 +227,7 @@ dialog {
 .horizontal-filters {
   position: static;
   display: grid;
-  grid-template-columns: minmax(220px, 2fr) minmax(180px, 1fr) minmax(180px, 1fr) auto;
+  grid-template-columns: minmax(220px, 2fr) repeat(2, minmax(180px, 1fr));
   gap: 1rem;
   align-items: end;
 }
@@ -333,10 +333,10 @@ textarea {
 
 .table-actions {
   display: grid;
-  grid-template-columns: repeat(2, minmax(72px, 1fr));
+  grid-template-columns: repeat(3, minmax(72px, 1fr));
   gap: 0.5rem;
   align-items: center;
-  min-width: 160px;
+  min-width: 245px;
 }
 
 .table-actions button {
