@@ -712,6 +712,13 @@ dialog::backdrop {
   min-width: 340px;
 }
 
+.rubric-grid h4 {
+  grid-column: 1 / -1;
+  margin: 0.25rem 0 0;
+  color: var(--brand-dark);
+  font-size: 0.85rem;
+}
+
 .rubric-grid label {
   gap: 0.25rem;
   font-size: 0.86rem;

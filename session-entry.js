@@ -45,7 +45,8 @@ function loadManuals() {
   return (window.NCERT_ACTIVITIES || []).map((activity) => ({
     id: activity.id,
     subject: activity.subject || "Maths",
-    name: activity.name
+    name: activity.name,
+    concepts: activity.concepts || "TIK: mathematics"
   }));
 }
 
@@ -83,6 +84,8 @@ function renderActivityOptions(selectedValue = "") {
   if (!activities.length) {
     $("#session-activity").innerHTML = '<option value="">No activities available for this subject</option>';
   }
+  syncConceptRubrics();
+  renderAttendanceTable();
 }
 
 function renderSchoolOptions() {
@@ -119,7 +122,8 @@ function addAttendanceStudent(student) {
     name,
     grade: typeof student === "string" ? "" : student.grade,
     present: true,
-    rubric: defaultRubric()
+    rubric: defaultRubric(),
+    conceptRubric: defaultConceptRubric()
   });
   renderAttendanceTable();
 }
@@ -159,7 +163,9 @@ function renderAttendanceTable() {
       </td>
       <td data-label="Performance rubric">
         <div class="rubric-grid">
+          <h4>General lab skills</h4>
           ${rubricCriteria.map((criterion) => rubricSelect(student, criterion)).join("")}
+          ${conceptRubricBlock(student)}
         </div>
       </td>
       <td data-label="Actions">
@@ -167,6 +173,23 @@ function renderAttendanceTable() {
       </td>
     </tr>
   `).join("");
+}
+
+function conceptRubricBlock(student) {
+  const criteria = selectedConceptCriteria();
+  if (!criteria.length) return "";
+  const rubric = { ...defaultConceptRubric(), ...(student.conceptRubric || {}) };
+  return `
+    <h4>Activity concepts</h4>
+    ${criteria.map((criterion) => `
+      <label>
+        ${escapeHtml(criterion.label)}
+        <select data-concept-student="${escapeAttr(student.id)}" data-concept-key="${escapeAttr(criterion.key)}">
+          ${rubricLevels.map((level) => `<option value="${level.value}" ${level.value === String(rubric[criterion.key] || "3") ? "selected" : ""}>${escapeHtml(level.label)}</option>`).join("")}
+        </select>
+      </label>
+    `).join("")}
+  `;
 }
 
 function rubricSelect(student, criterion) {
@@ -185,8 +208,54 @@ function defaultRubric() {
   return Object.fromEntries(rubricCriteria.map((criterion) => [criterion.key, "3"]));
 }
 
+function defaultConceptRubric(criteria = selectedConceptCriteria()) {
+  return Object.fromEntries(criteria.map((criterion) => [criterion.key, "3"]));
+}
+
+function selectedActivity() {
+  return manuals.find((manual) => manual.id === $("#session-activity").value);
+}
+
+function selectedConceptCriteria(activity = selectedActivity()) {
+  const concepts = extractConcepts(activity);
+  return concepts.map((concept) => ({
+    key: concept.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""),
+    label: concept
+  }));
+}
+
+function extractConcepts(activity) {
+  const text = `${activity?.concepts || ""}, ${activity?.name || ""}`;
+  const explicit = (activity?.concepts || "")
+    .replace(/^TIK:\s*/i, "")
+    .split(",")
+    .map((item) => item.trim())
+    .filter((item) => item && !/^mathematics$/i.test(item));
+  const inferred = [
+    ["addition", /\b(add|addition|sum)\b/i],
+    ["subtraction", /\b(subtract|subtraction|difference)\b/i],
+    ["multiplication", /\b(multiply|multiplication|multiples)\b/i],
+    ["division and factors", /\b(divide|division|factor)\b/i],
+    ["geometry", /\b(shape|geometry|cube|cuboid|2-d|3-d|tangram|net)\b/i],
+    ["data handling", /\b(data|graph|display|interpret)\b/i],
+    ["patterns", /\b(pattern|pyramid|puzzle|cross number)\b/i],
+    ["measurement", /\b(measure|volume|length|time)\b/i],
+    ["scientific reasoning", /\b(observe|infer|fair test|compare)\b/i]
+  ].filter(([, pattern]) => pattern.test(text)).map(([concept]) => concept);
+  return [...new Set([...explicit, ...inferred])].slice(0, 4);
+}
+
+function syncConceptRubrics() {
+  const defaults = defaultConceptRubric();
+  attendance = attendance.map((student) => ({
+    ...student,
+    conceptRubric: { ...defaults, ...(student.conceptRubric || {}) }
+  }));
+}
+
 function collectSession() {
-  const activity = manuals.find((manual) => manual.id === $("#session-activity").value);
+  const activity = selectedActivity();
+  const conceptCriteria = selectedConceptCriteria(activity);
   return {
     id: $("#session-id").value || makeId("session"),
     facilitator: $("#session-facilitator").value.trim(),
@@ -196,9 +265,11 @@ function collectSession() {
     subject: $("#session-subject").value,
     activityId: $("#session-activity").value,
     activityName: activity?.name || $("#session-activity").selectedOptions[0]?.textContent || "",
+    conceptCriteria,
     attendance: attendance.map((student) => ({
       ...student,
-      rubric: { ...defaultRubric(), ...(student.rubric || {}) }
+      rubric: { ...defaultRubric(), ...(student.rubric || {}) },
+      conceptRubric: { ...defaultConceptRubric(conceptCriteria), ...(student.conceptRubric || {}) }
     }))
   };
 }
@@ -236,7 +307,8 @@ function renderSessionsTable() {
   }
   $("#sessions-table").innerHTML = [...sessions].sort((a, b) => b.date.localeCompare(a.date)).map((session) => {
     const present = session.attendance.filter((student) => student.present).length;
-    const score = sessionRubricAverage(session);
+    const score = sessionRubricAverage(session, "rubric", rubricCriteria);
+    const conceptScore = sessionRubricAverage(session, "conceptRubric", session.conceptCriteria || []);
     return `
       <tr>
         <td data-label="Date">${escapeHtml(session.date)}</td>
@@ -246,7 +318,7 @@ function renderSessionsTable() {
         <td data-label="Activity"><strong>${escapeHtml(session.activityName)}</strong></td>
         <td data-label="Facilitator">${escapeHtml(session.facilitator)}</td>
         <td data-label="Attendance">${present}/${session.attendance.length} present</td>
-        <td data-label="Performance">${score ? `${score}/4 avg` : "Not rated"}</td>
+        <td data-label="Performance">${performanceSummary(score, conceptScore)}</td>
         <td data-label="Actions">
           <div class="student-actions">
             <button type="button" data-edit-session="${escapeAttr(session.id)}">Edit</button>
@@ -270,7 +342,8 @@ function editSession(id) {
   renderActivityOptions(session.activityId);
   attendance = session.attendance.map((student) => ({
     ...student,
-    rubric: { ...defaultRubric(), ...(student.rubric || {}) }
+    rubric: { ...defaultRubric(), ...(student.rubric || {}) },
+    conceptRubric: { ...defaultConceptRubric(session.conceptCriteria || selectedConceptCriteria()), ...(student.conceptRubric || {}) }
   }));
   renderStudentOptions();
   renderAttendanceTable();
@@ -303,6 +376,7 @@ function resetSessionForm() {
 function handleAttendanceClick(event) {
   const present = event.target.closest("[data-attendance-present]");
   const rubric = event.target.closest("[data-rubric-student]");
+  const conceptRubric = event.target.closest("[data-concept-student]");
   const remove = event.target.closest("[data-remove-attendance]");
   if (present) {
     const student = attendance.find((item) => item.id === present.dataset.attendancePresent);
@@ -315,20 +389,34 @@ function handleAttendanceClick(event) {
       student.rubric[rubric.dataset.rubricKey] = rubric.value;
     }
   }
+  if (conceptRubric) {
+    const student = attendance.find((item) => item.id === conceptRubric.dataset.conceptStudent);
+    if (student) {
+      student.conceptRubric = { ...defaultConceptRubric(), ...(student.conceptRubric || {}) };
+      student.conceptRubric[conceptRubric.dataset.conceptKey] = conceptRubric.value;
+    }
+  }
   if (remove) {
     attendance = attendance.filter((item) => item.id !== remove.dataset.removeAttendance);
     renderAttendanceTable();
   }
 }
 
-function sessionRubricAverage(session) {
+function sessionRubricAverage(session, rubricKey, criteria) {
   const scores = session.attendance.flatMap((student) => {
-    const rubric = { ...defaultRubric(), ...(student.rubric || {}) };
-    return rubricCriteria.map((criterion) => Number(rubric[criterion.key])).filter(Boolean);
+    const rubric = student[rubricKey] || {};
+    return criteria.map((criterion) => Number(rubric[criterion.key])).filter(Boolean);
   });
   if (!scores.length) return "";
   const average = scores.reduce((sum, score) => sum + score, 0) / scores.length;
   return average.toFixed(1);
+}
+
+function performanceSummary(generalScore, conceptScore) {
+  const parts = [];
+  if (generalScore) parts.push(`General ${generalScore}/4`);
+  if (conceptScore) parts.push(`Concept ${conceptScore}/4`);
+  return parts.length ? parts.join("; ") : "Not rated";
 }
 
 function handleSessionsClick(event) {
@@ -377,6 +465,10 @@ renderSessionsTable();
 $("#session-state").addEventListener("change", renderStudentOptions);
 $("#session-school").addEventListener("input", renderStudentOptions);
 $("#session-subject").addEventListener("change", () => renderActivityOptions());
+$("#session-activity").addEventListener("change", () => {
+  syncConceptRubrics();
+  renderAttendanceTable();
+});
 $("#add-attendance-student").addEventListener("click", addSelectedStudent);
 $("#add-school-roster").addEventListener("click", addSchoolRoster);
 $("#attendance-table").addEventListener("change", handleAttendanceClick);
