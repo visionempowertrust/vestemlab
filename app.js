@@ -1,4 +1,4 @@
-const STORAGE_KEY = "veStemLabData.v2";
+const STORAGE_KEY = "veStemLabData.v3";
 const resourceCategories = [
   "Computational Thinking (CT)",
   "Basic Science",
@@ -24,6 +24,7 @@ const fallbackResources = [
   { id: "res-fallback-2", subject: "Physics", name: "See Saw", image: "https://visionempowertrust.org/arc/wp-content/uploads/See-%E2%80%93-Saw.webp", video: "https://youtu.be/pJN4_7mADEU?si=8Vuuq6iUZOlxAAM4", supplier: "Kallingal Distributors", uses: "Explore levers, balance, torque, and fulcrum position.", tags: [] }
 ];
 const registryResources = Array.isArray(window.ARC_RESOURCES) ? window.ARC_RESOURCES : fallbackResources;
+const ncertActivities = Array.isArray(window.NCERT_ACTIVITIES) ? window.NCERT_ACTIVITIES : [];
 const seedResources = registryResources.map((resource, index) => ({
   id: resource.id || makeId("res"),
   tags: [],
@@ -111,7 +112,7 @@ function seedManuals(resources) {
     .filter((resource) => needles.some((needle) => resource.name.toLowerCase().includes(needle.toLowerCase())))
     .map((resource) => resource.id);
 
-  return [
+  const baseManuals = [
     {
       id: "manual-lever-balance",
       subject: "Physics",
@@ -257,6 +258,40 @@ function seedManuals(resources) {
       concepts: "TIK: rotation, light, shadow, day, night"
     }
   ];
+
+  return [
+    ...baseManuals,
+    ...manualsFromNcertActivities(resources)
+  ];
+}
+
+function manualsFromNcertActivities(resources) {
+  return ncertActivities.map((activity) => ({
+    id: activity.id || makeId("manual"),
+    subject: activity.subject || "Maths",
+    name: activity.name || `NCERT Activity ${activity.activityNumber || ""}`.trim(),
+    objective: activity.objective || "",
+    resourceIds: resourceIdsByQueries(resources, activity.resourceQueries || []),
+    otherResources: [
+      activity.otherResources,
+      activity.source ? `Source: ${activity.source}` : ""
+    ].filter(Boolean).join("\n"),
+    steps: activity.steps || "",
+    observations: activity.observations || "",
+    inferences: activity.inferences || "",
+    concepts: activity.concepts || "TIK: mathematics"
+  }));
+}
+
+function resourceIdsByQueries(resources, queries) {
+  const ids = [];
+  queries.forEach((query) => {
+    const match = resources.find((resource) => resource.name.toLowerCase().includes(query.toLowerCase()));
+    if (match && !ids.includes(match.id)) {
+      ids.push(match.id);
+    }
+  });
+  return ids;
 }
 
 function persist() {
