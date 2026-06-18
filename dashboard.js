@@ -14,8 +14,8 @@ const rubricLevelLabels = {
   "1": "Not yet"
 };
 
-const students = loadArray(STUDENTS_STORAGE_KEY);
-const sessions = loadArray(SESSIONS_STORAGE_KEY);
+let students = loadArray(STUDENTS_STORAGE_KEY);
+let sessions = loadArray(SESSIONS_STORAGE_KEY);
 let dashboardRows = buildDashboardRows();
 
 function loadArray(key) {
@@ -235,8 +235,32 @@ function escapeAttr(value) {
   return escapeHtml(value).replace(/\n/g, " ");
 }
 
+async function initializeDashboard() {
+  if (!window.StemLabStore?.isEnabled()) return;
+  $("#dashboard-status").textContent = "Loading";
+  const [studentResult, sessionResult] = await Promise.allSettled([
+    window.StemLabStore.loadRegisteredStudents(),
+    window.StemLabStore.ensureSessions(sessions)
+  ]);
+  try {
+    if (studentResult.status === "fulfilled") students = studentResult.value;
+    if (sessionResult.status === "fulfilled") sessions = sessionResult.value;
+    localStorage.setItem(STUDENTS_STORAGE_KEY, JSON.stringify(students));
+    localStorage.setItem(SESSIONS_STORAGE_KEY, JSON.stringify(sessions));
+    dashboardRows = buildDashboardRows();
+    renderFilters();
+    renderDashboard();
+    $("#dashboard-status").textContent = studentResult.status === "fulfilled" ? "Students connected" : "Browser data";
+    if (studentResult.status === "rejected") throw studentResult.reason;
+  } catch (error) {
+    console.error("Dashboard database load failed", error);
+    $("#dashboard-status").textContent = "Browser data";
+  }
+}
+
 renderFilters();
 renderDashboard();
+initializeDashboard();
 
 $("#dashboard-search").addEventListener("input", renderDashboard);
 $("#dashboard-state-filter").addEventListener("change", renderDashboard);

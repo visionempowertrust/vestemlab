@@ -21,7 +21,7 @@ const $ = (selector) => document.querySelector(selector);
 let students = loadArray(STUDENTS_STORAGE_KEY);
 let sessions = loadArray(SESSIONS_STORAGE_KEY);
 let attendance = [];
-const manuals = loadManuals();
+let manuals = loadManuals();
 
 function loadArray(key) {
   try {
@@ -88,67 +88,46 @@ function renderActivityOptions(selectedValue = "") {
   renderAttendanceTable();
 }
 
-function renderSchoolOptions() {
-  const schools = [...new Set(students.map((student) => student.school).filter(Boolean))].sort();
-  $("#school-options").innerHTML = schools.map((school) => `<option value="${escapeAttr(school)}"></option>`).join("");
+function renderSchoolOptions(selectedValue = "") {
+  const state = $("#session-state").value;
+  const schools = [...new Set(students.filter((student) => !state || student.state === state).map((student) => student.school).filter(Boolean))].sort();
+  setOptions($("#session-school"), schools, selectedValue || schools[0] || "");
+  if (!schools.length) $("#session-school").innerHTML = '<option value="">No registered schools</option>';
 }
 
-function renderStudentOptions() {
-  const matchingStudents = matchingRoster();
-  $("#student-options").innerHTML = matchingStudents
-    .map((student) => `<option value="${escapeAttr(student.name)}">${escapeHtml(student.school)}${student.grade ? `, Grade ${escapeHtml(student.grade)}` : ""}</option>`)
-    .join("");
+function renderGradeOptions(selectedValue = "") {
+  const grades = [...new Set(students.map((student) => String(student.grade)).filter(Boolean))].sort((a, b) => Number(a) - Number(b));
+  setOptions($("#session-grade-filter"), [{ value: "all", label: "All grades" }, ...grades], selectedValue || "all");
 }
 
 function matchingRoster() {
   const state = $("#session-state").value;
   const school = $("#session-school").value.trim().toLowerCase();
+  const grade = $("#session-grade-filter").value;
   return students.filter((student) => (
     (!state || student.state === state) &&
-    (!school || (student.school || "").toLowerCase() === school)
+    (!school || (student.school || "").toLowerCase() === school) &&
+    (grade === "all" || String(student.grade) === grade)
   ));
 }
 
-function addAttendanceStudent(student) {
-  const name = typeof student === "string" ? student.trim() : student.name;
-  if (!name) return;
-  const existing = attendance.some((item) => item.name.toLowerCase() === name.toLowerCase());
-  if (existing) {
-    toast("Student already added");
-    return;
-  }
-  attendance.push({
-    id: typeof student === "string" ? makeId("att") : student.id,
-    name,
-    grade: typeof student === "string" ? "" : student.grade,
-    present: true,
+function syncAttendanceRoster() {
+  const existing = new Map(attendance.map((student) => [student.id, student]));
+  attendance = matchingRoster().map((student) => existing.get(student.id) || {
+    id: student.id,
+    name: student.name,
+    grade: student.grade,
+    present: false,
     rubric: defaultRubric(),
     conceptRubric: defaultConceptRubric()
   });
   renderAttendanceTable();
 }
 
-function addSelectedStudent() {
-  const name = $("#student-picker").value.trim();
-  const match = matchingRoster().find((student) => student.name.toLowerCase() === name.toLowerCase());
-  addAttendanceStudent(match || name);
-  $("#student-picker").value = "";
-}
-
-function addSchoolRoster() {
-  const roster = matchingRoster();
-  if (!roster.length) {
-    toast("No registered students match this state and school");
-    return;
-  }
-  roster.forEach(addAttendanceStudent);
-  toast("Roster added");
-}
-
 function renderAttendanceTable() {
   $("#attendance-count").textContent = `${attendance.length} student${attendance.length === 1 ? "" : "s"}`;
   if (!attendance.length) {
-    $("#attendance-table").innerHTML = '<tr><td colspan="5" class="empty-table-cell">No students added for attendance yet.</td></tr>';
+    $("#attendance-table").innerHTML = '<tr><td colspan="4" class="empty-table-cell">No registered students match these filters.</td></tr>';
     return;
   }
   $("#attendance-table").innerHTML = attendance.map((student) => `
@@ -167,9 +146,6 @@ function renderAttendanceTable() {
           ${rubricCriteria.map((criterion) => rubricSelect(student, criterion)).join("")}
           ${conceptRubricBlock(student)}
         </div>
-      </td>
-      <td data-label="Actions">
-        <button class="danger" type="button" data-remove-attendance="${escapeAttr(student.id)}">Remove</button>
       </td>
     </tr>
   `).join("");
@@ -274,7 +250,7 @@ function collectSession() {
   };
 }
 
-function saveSession(event) {
+async function saveSession(event) {
   event.preventDefault();
   const session = collectSession();
   if (!session.facilitator || !session.date || !session.school || !session.activityId) {
@@ -289,6 +265,12 @@ function saveSession(event) {
   if (index >= 0) sessions[index] = session;
   else sessions.push(session);
   persistSessions();
+  try {
+    if (window.StemLabStore?.isEnabled()) await window.StemLabStore.saveSession(session);
+  } catch (error) {
+    console.error("Session database save failed", error);
+    toast("Saved in this browser; database save failed.");
+  }
   resetSessionForm();
   renderSessionsTable();
   setStatus("Saved");
@@ -345,17 +327,24 @@ function editSession(id) {
     rubric: { ...defaultRubric(), ...(student.rubric || {}) },
     conceptRubric: { ...defaultConceptRubric(session.conceptCriteria || selectedConceptCriteria()), ...(student.conceptRubric || {}) }
   }));
-  renderStudentOptions();
+  renderSchoolOptions(session.school);
+  renderGradeOptions();
   renderAttendanceTable();
   setStatus("Editing");
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-function deleteSession(id) {
+async function deleteSession(id) {
   const session = sessions.find((item) => item.id === id);
   if (!session || !confirm(`Delete the ${session.date} session for ${session.school}?`)) return;
   sessions = sessions.filter((item) => item.id !== id);
   persistSessions();
+  try {
+    if (window.StemLabStore?.isEnabled()) await window.StemLabStore.deleteSession(id);
+  } catch (error) {
+    console.error("Session database delete failed", error);
+    toast("Deleted in this browser; database delete failed.");
+  }
   renderSessionsTable();
   setStatus("Deleted");
   toast("Session deleted");
@@ -366,10 +355,11 @@ function resetSessionForm() {
   $("#session-id").value = "";
   $("#session-date").valueAsDate = new Date();
   renderStateOptions();
+  renderSchoolOptions();
+  renderGradeOptions();
   renderSubjectOptions();
   attendance = [];
-  renderStudentOptions();
-  renderAttendanceTable();
+  syncAttendanceRoster();
   setStatus("Ready");
 }
 
@@ -377,7 +367,6 @@ function handleAttendanceClick(event) {
   const present = event.target.closest("[data-attendance-present]");
   const rubric = event.target.closest("[data-rubric-student]");
   const conceptRubric = event.target.closest("[data-concept-student]");
-  const remove = event.target.closest("[data-remove-attendance]");
   if (present) {
     const student = attendance.find((item) => item.id === present.dataset.attendancePresent);
     if (student) student.present = present.checked;
@@ -395,10 +384,6 @@ function handleAttendanceClick(event) {
       student.conceptRubric = { ...defaultConceptRubric(), ...(student.conceptRubric || {}) };
       student.conceptRubric[conceptRubric.dataset.conceptKey] = conceptRubric.value;
     }
-  }
-  if (remove) {
-    attendance = attendance.filter((item) => item.id !== remove.dataset.removeAttendance);
-    renderAttendanceTable();
   }
 }
 
@@ -456,21 +441,54 @@ function escapeAttr(value) {
   return escapeHtml(value).replace(/\n/g, " ");
 }
 
+async function initializeSessionData() {
+  if (!window.StemLabStore?.isEnabled()) return;
+  setStatus("Loading");
+  const [studentResult, sessionResult, labResult] = await Promise.allSettled([
+    window.StemLabStore.loadRegisteredStudents(),
+    window.StemLabStore.ensureSessions(sessions),
+    window.StemLabStore.loadLabData()
+  ]);
+  if (studentResult.status === "fulfilled") students = studentResult.value;
+  if (sessionResult.status === "fulfilled") sessions = sessionResult.value;
+  if (labResult.status === "fulfilled" && labResult.value.manuals.length) manuals = labResult.value.manuals;
+  try {
+    localStorage.setItem(STUDENTS_STORAGE_KEY, JSON.stringify(students));
+    persistSessions();
+    renderStateOptions(students[0]?.state || "");
+    renderSchoolOptions();
+    renderGradeOptions();
+    renderSubjectOptions();
+    syncAttendanceRoster();
+    renderSessionsTable();
+    setStatus(studentResult.status === "fulfilled" ? "Students connected" : "Browser data");
+    if (studentResult.status === "rejected") throw studentResult.reason;
+    if (sessionResult.status === "rejected" || labResult.status === "rejected") {
+      toast("Students loaded. Run supabase-schema.sql to enable shared STEM Lab data.");
+    }
+  } catch (error) {
+    console.error("Session database load failed", error);
+    setStatus("Browser data");
+    toast("Could not load shared students from Supabase.");
+  }
+}
+
 renderStateOptions();
 renderSubjectOptions();
 renderSchoolOptions();
+renderGradeOptions();
 resetSessionForm();
 renderSessionsTable();
+initializeSessionData();
 
-$("#session-state").addEventListener("change", renderStudentOptions);
-$("#session-school").addEventListener("input", renderStudentOptions);
+$("#session-state").addEventListener("change", () => { renderSchoolOptions(); syncAttendanceRoster(); });
+$("#session-school").addEventListener("change", syncAttendanceRoster);
+$("#session-grade-filter").addEventListener("change", syncAttendanceRoster);
 $("#session-subject").addEventListener("change", () => renderActivityOptions());
 $("#session-activity").addEventListener("change", () => {
   syncConceptRubrics();
   renderAttendanceTable();
 });
-$("#add-attendance-student").addEventListener("click", addSelectedStudent);
-$("#add-school-roster").addEventListener("click", addSchoolRoster);
 $("#attendance-table").addEventListener("change", handleAttendanceClick);
 $("#attendance-table").addEventListener("click", handleAttendanceClick);
 $("#sessions-table").addEventListener("click", handleSessionsClick);

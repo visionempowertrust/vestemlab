@@ -77,6 +77,7 @@ manualForm.addEventListener("submit", saveManual);
 
 render();
 setInitialView();
+initializeDatabase();
 
 function loadState() {
   const stored = localStorage.getItem(STORAGE_KEY);
@@ -98,16 +99,19 @@ function loadState() {
 }
 
 function migrateState(parsed) {
+  const resources = parsed.resources.map((resource) => ({
+    ...resource,
+    subject: normalizeResourceCategory(resource.subject)
+  }));
+  const manualsById = new Map(seedManuals(resources).map((manual) => [manual.id, manual]));
+  parsed.manuals.forEach((manual) => manualsById.set(manual.id, {
+    subject: "Basic Science",
+    otherResources: "",
+    ...manual
+  }));
   return {
-    resources: parsed.resources.map((resource) => ({
-      ...resource,
-      subject: normalizeResourceCategory(resource.subject)
-    })),
-    manuals: parsed.manuals.map((manual) => ({
-      subject: "Basic Science",
-      otherResources: "",
-      ...manual
-    }))
+    resources,
+    manuals: [...manualsById.values()]
   };
 }
 
@@ -300,6 +304,18 @@ function resourceIdsByQueries(resources, queries) {
 
 function persist() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+async function initializeDatabase() {
+  if (!window.StemLabStore?.isEnabled()) return;
+  try {
+    state = await window.StemLabStore.ensureLabSeed(seedResources, seedManuals(seedResources));
+    persist();
+    render();
+  } catch (error) {
+    console.error("Supabase initialization failed", error);
+    toast("Using browser data. Run supabase-schema.sql to enable shared data.");
+  }
 }
 
 function render() {
@@ -603,7 +619,7 @@ function openResourceForm(id) {
   resourceDialog.showModal();
 }
 
-function saveResource(event) {
+async function saveResource(event) {
   event.preventDefault();
   const form = new FormData(resourceForm);
   const id = form.get("id") || makeId("res");
@@ -621,12 +637,18 @@ function saveResource(event) {
   if (index >= 0) state.resources[index] = resource;
   else state.resources.push(resource);
   persist();
+  try {
+    if (window.StemLabStore?.isEnabled()) await window.StemLabStore.saveResource(resource);
+  } catch (error) {
+    console.error("Resource database save failed", error);
+    toast("Saved in this browser; database save failed.");
+  }
   resourceDialog.close();
   toast("Resource saved");
   render();
 }
 
-function deleteResource(id) {
+async function deleteResource(id) {
   const resource = state.resources.find((item) => item.id === id);
   if (!resource || !confirm(`Delete ${resource.name}? Manuals will keep running, but this resource link will be removed.`)) return;
   state.resources = state.resources.filter((item) => item.id !== id);
@@ -635,6 +657,12 @@ function deleteResource(id) {
     resourceIds: (manual.resourceIds || []).filter((resourceId) => resourceId !== id)
   }));
   persist();
+  try {
+    if (window.StemLabStore?.isEnabled()) await window.StemLabStore.deleteResource(id);
+  } catch (error) {
+    console.error("Resource database delete failed", error);
+    toast("Deleted in this browser; database delete failed.");
+  }
   toast("Resource deleted");
   render();
 }
@@ -656,7 +684,7 @@ function openManualForm(id) {
   manualDialog.showModal();
 }
 
-function saveManual(event) {
+async function saveManual(event) {
   event.preventDefault();
   const form = new FormData(manualForm);
   const id = form.get("id") || makeId("man");
@@ -677,16 +705,28 @@ function saveManual(event) {
   if (index >= 0) state.manuals[index] = manual;
   else state.manuals.push(manual);
   persist();
+  try {
+    if (window.StemLabStore?.isEnabled()) await window.StemLabStore.saveManual(manual);
+  } catch (error) {
+    console.error("Manual database save failed", error);
+    toast("Saved in this browser; database save failed.");
+  }
   manualDialog.close();
   toast("Manual saved");
   render();
 }
 
-function deleteManual(id) {
+async function deleteManual(id) {
   const manual = state.manuals.find((item) => item.id === id);
   if (!manual || !confirm(`Delete ${manual.name}?`)) return;
   state.manuals = state.manuals.filter((item) => item.id !== id);
   persist();
+  try {
+    if (window.StemLabStore?.isEnabled()) await window.StemLabStore.deleteManual(id);
+  } catch (error) {
+    console.error("Manual database delete failed", error);
+    toast("Deleted in this browser; database delete failed.");
+  }
   toast("Manual deleted");
   render();
 }

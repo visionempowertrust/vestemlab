@@ -106,14 +106,25 @@ function collectForm() {
   };
 }
 
-function saveStudent(event) {
+async function saveStudent(event) {
   event.preventDefault();
   const student = collectForm();
   if (!student.name || !student.school) {
     toast("Student name and school are required.");
     return;
   }
-  const index = registeredStudents.findIndex((item) => item.id === student.id);
+  try {
+    if (window.StemLabStore?.isEnabled()) {
+      const saved = await window.StemLabStore.saveRegisteredStudent(student);
+      student.id = saved.id;
+    }
+  } catch (error) {
+    console.error("Student database save failed", error);
+    toast("Saved in this browser; database save failed.");
+  }
+  const index = registeredStudents.findIndex((item) => item.id === student.id || (
+    item.name === student.name && item.state === student.state && item.school === student.school
+  ));
   if (index >= 0) {
     registeredStudents[index] = student;
   } else {
@@ -153,11 +164,17 @@ function editStudent(studentId) {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
-function deleteStudent(studentId) {
+async function deleteStudent(studentId) {
   const student = registeredStudents.find((item) => item.id === studentId);
   if (!student || !confirm(`Delete ${student.name} from registered students?`)) return;
   registeredStudents = registeredStudents.filter((item) => item.id !== studentId);
   persistStudents();
+  try {
+    if (window.StemLabStore?.isEnabled()) await window.StemLabStore.deleteRegisteredStudent(studentId);
+  } catch (error) {
+    console.error("Student database delete failed", error);
+    toast("Deleted in this browser; database delete failed.");
+  }
   renderStudentsTable();
   setStatus("Deleted");
   toast("Student deleted");
@@ -208,9 +225,25 @@ function escapeAttr(value) {
   return escapeHtml(value).replace(/\n/g, " ");
 }
 
+async function initializeStudents() {
+  if (!window.StemLabStore?.isEnabled()) return;
+  setStatus("Loading");
+  try {
+    registeredStudents = await window.StemLabStore.loadRegisteredStudents();
+    persistStudents();
+    renderStudentsTable();
+    setStatus("Database connected");
+  } catch (error) {
+    console.error("Student database load failed", error);
+    setStatus("Browser data");
+    toast("Could not load shared students from Supabase.");
+  }
+}
+
 renderStaticOptions();
 renderStateOptions();
 renderStudentsTable();
+initializeStudents();
 
 $("#student-state").addEventListener("change", () => renderDistrictOptions());
 $("#student-registration-form").addEventListener("submit", saveStudent);
