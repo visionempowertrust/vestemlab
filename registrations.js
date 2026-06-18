@@ -27,6 +27,7 @@ function renderView() {
   const type = $("#registration-type").value;
   $("#schools-registration").hidden = type !== "schools";
   $("#facilitators-registration").hidden = type !== "facilitators";
+  $("#students-registration").hidden = type !== "students";
   history.replaceState(null, "", `#${type}`);
 }
 function renderSchools() {
@@ -98,7 +99,7 @@ function escapeHtml(value) { return String(value ?? "").replace(/&/g,"&amp;").re
 function escapeAttr(value) { return escapeHtml(value).replace(/\n/g, " "); }
 
 renderSchoolState(); renderFacilitatorState(); renderSchools(); renderFacilitators();
-const initialType = location.hash === "#facilitators" ? "facilitators" : "schools"; $("#registration-type").value = initialType; renderView(); initialize();
+const initialType = ["#facilitators", "#students"].includes(location.hash) ? location.hash.slice(1) : "schools"; $("#registration-type").value = initialType; renderView(); initialize();
 $("#registration-type").addEventListener("change", renderView); $("#school-state").addEventListener("change", () => renderSchoolDistrict());
 $("#school-form").addEventListener("submit", saveSchool); $("#facilitator-form").addEventListener("submit", saveFacilitator);
 $("#clear-school").addEventListener("click", resetSchool); $("#clear-facilitator").addEventListener("click", resetFacilitator);

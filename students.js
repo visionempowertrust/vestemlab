@@ -1,3 +1,4 @@
+(function () {
 const STUDENTS_STORAGE_KEY = "veStemLabStudents.v1";
 const SCHOOLS_STORAGE_KEY = "veStemLabSchools.v1";
 const locations = window.INDIA_LOCATIONS || {};
@@ -283,3 +284,4 @@ $("#student-district").addEventListener("change", () => renderSchoolOptions());
 $("#student-registration-form").addEventListener("submit", saveStudent);
 $("#reset-student-form").addEventListener("click", resetForm);
 $("#registered-students-table").addEventListener("click", handleTableClick);
+})();
