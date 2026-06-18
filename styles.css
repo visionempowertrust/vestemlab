@@ -682,6 +682,102 @@ dialog::backdrop {
   margin-top: 1rem;
 }
 
+.student-history {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.student-history > h4 {
+  margin: 0;
+}
+
+.history-entry {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0.9rem;
+}
+
+.history-entry-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.history-entry-head > div {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.history-entry-head span,
+.history-facilitator,
+.history-note {
+  color: var(--muted);
+}
+
+.attendance-status {
+  flex: none;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.attendance-status.is-present {
+  color: #176b3a;
+  background: #edf8f1;
+}
+
+.attendance-status.is-absent {
+  color: #9b2c2c;
+  background: #fff2f2;
+}
+
+.history-facilitator,
+.history-note {
+  margin: 0.65rem 0 0;
+}
+
+.learning-history {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  border-top: 1px solid var(--line);
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+}
+
+.learning-history h5 {
+  margin: 0 0 0.45rem;
+  font-size: 0.9rem;
+}
+
+.learning-history dl,
+.learning-history dl div {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+}
+
+.learning-history dl div {
+  grid-template-columns: minmax(0, 1fr) auto;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 0.35rem;
+}
+
+.learning-history dt,
+.learning-history dd {
+  margin: 0;
+  font-size: 0.84rem;
+}
+
+.learning-history dd {
+  text-align: right;
+  font-weight: 800;
+}
+
 .attendance-panel {
   display: grid;
   gap: 1rem;
@@ -834,6 +930,19 @@ dialog::backdrop {
   .rubric-grid {
     grid-template-columns: 1fr;
     min-width: 0;
+  }
+
+  .history-entry-head,
+  .learning-history {
+    grid-template-columns: 1fr;
+  }
+
+  .history-entry-head {
+    display: grid;
+  }
+
+  .attendance-status {
+    justify-self: start;
   }
 
   .resource-detail-grid {

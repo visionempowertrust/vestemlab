@@ -1,6 +1,18 @@
 const STUDENTS_STORAGE_KEY = "veStemLabStudents.v1";
 const SESSIONS_STORAGE_KEY = "veStemLabSessions.v1";
 const $ = (selector) => document.querySelector(selector);
+const generalRubricLabels = {
+  materialHandling: "Material handling",
+  safety: "Safety",
+  participation: "Participation",
+  observationInference: "Observation and inference"
+};
+const rubricLevelLabels = {
+  "4": "Independent",
+  "3": "With prompts",
+  "2": "Needs support",
+  "1": "Not yet"
+};
 
 const students = loadArray(STUDENTS_STORAGE_KEY);
 const sessions = loadArray(SESSIONS_STORAGE_KEY);
@@ -31,7 +43,7 @@ function buildDashboardRows() {
   });
 
   sessions.forEach((session) => {
-    (session.attendance || []).filter((student) => student.present).forEach((student) => {
+    (session.attendance || []).forEach((student) => {
       const key = studentKey(student.name, session.state, session.school);
       if (!map.has(key)) {
         map.set(key, {
@@ -48,7 +60,11 @@ function buildDashboardRows() {
         subject: session.subject,
         activityName: session.activityName,
         facilitator: session.facilitator,
-        performance: performanceSummary(session, student)
+        present: Boolean(student.present),
+        performance: performanceSummary(session, student),
+        rubric: student.rubric || {},
+        conceptRubric: student.conceptRubric || {},
+        conceptCriteria: session.conceptCriteria || []
       });
     });
   });
@@ -85,7 +101,7 @@ function renderDashboard() {
   $("#dashboard-row-count").textContent = `${rows.length} record${rows.length === 1 ? "" : "s"}`;
   $("#dashboard-student-count").textContent = dashboardRows.length;
   $("#dashboard-session-count").textContent = sessions.length;
-  $("#dashboard-attendance-count").textContent = dashboardRows.reduce((sum, row) => sum + row.sessions.length, 0);
+  $("#dashboard-attendance-count").textContent = dashboardRows.reduce((sum, row) => sum + attendedCount(row), 0);
 
   if (!rows.length) {
     $("#dashboard-table").innerHTML = '<tr><td colspan="5" class="empty-table-cell">No student records match the current filters.</td></tr>';
@@ -97,7 +113,7 @@ function renderDashboard() {
       <td data-label="State">${escapeHtml(row.state || "Not set")}</td>
       <td data-label="School">${escapeHtml(row.school || "Not set")}</td>
       <td data-label="Student name"><strong>${escapeHtml(row.name)}</strong>${row.registered ? "" : ' <span class="badge">session entry</span>'}</td>
-      <td data-label="Lab sessions attended">${row.sessions.length}</td>
+      <td data-label="Lab sessions attended">${attendedCount(row)}</td>
       <td data-label="More Details">
         <button type="button" data-student-details="${escapeAttr(row.id)}">Details</button>
       </td>
@@ -113,40 +129,72 @@ function openStudentDetails(id) {
     <div class="manual-details-summary">
       <p><strong>State:</strong> ${escapeHtml(row.state || "Not set")}</p>
       <p><strong>School:</strong> ${escapeHtml(row.school || "Not set")}</p>
-      <p><strong>Lab sessions attended:</strong> ${row.sessions.length}</p>
+      <p><strong>Lab sessions attended:</strong> ${attendedCount(row)}</p>
+      <p><strong>Lab sessions recorded:</strong> ${row.sessions.length}</p>
     </div>
-    ${row.sessions.length ? sessionDetailsTable(row.sessions) : '<p class="empty-state">No attended lab sessions recorded yet.</p>'}
+    ${row.sessions.length ? sessionHistory(row.sessions) : '<p class="empty-state">No lab session history recorded yet.</p>'}
   `;
   $("#student-details-dialog").showModal();
 }
 
-function sessionDetailsTable(studentSessions) {
+function sessionHistory(studentSessions) {
   return `
-    <div class="resource-table-wrap details-table-wrap">
-      <table class="resource-table students-table">
-        <thead>
-          <tr>
-            <th scope="col">Date</th>
-            <th scope="col">Subject</th>
-            <th scope="col">Activity</th>
-            <th scope="col">Facilitator</th>
-            <th scope="col">Performance</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${studentSessions.sort((a, b) => b.date.localeCompare(a.date)).map((session) => `
-            <tr>
-              <td data-label="Date">${escapeHtml(session.date)}</td>
-              <td data-label="Subject">${escapeHtml(session.subject)}</td>
-              <td data-label="Activity">${escapeHtml(session.activityName)}</td>
-              <td data-label="Facilitator">${escapeHtml(session.facilitator)}</td>
-              <td data-label="Performance">${escapeHtml(session.performance)}</td>
-            </tr>
-          `).join("")}
-        </tbody>
-      </table>
+    <section class="student-history" aria-labelledby="student-history-heading">
+      <h4 id="student-history-heading">Lab session history</h4>
+      ${[...studentSessions].sort((a, b) => (b.date || "").localeCompare(a.date || "")).map((session) => `
+        <article class="history-entry">
+          <div class="history-entry-head">
+            <div>
+              <strong>${escapeHtml(session.activityName || "Activity not set")}</strong>
+              <span>${escapeHtml(formatDate(session.date))} · ${escapeHtml(session.subject || "Subject not set")}</span>
+            </div>
+            <span class="attendance-status ${session.present ? "is-present" : "is-absent"}">${session.present ? "Present" : "Absent"}</span>
+          </div>
+          <p class="history-facilitator"><strong>Facilitator:</strong> ${escapeHtml(session.facilitator || "Not set")}</p>
+          ${session.present ? learningDetails(session) : '<p class="history-note">No learning assessment recorded because the student was absent.</p>'}
+        </article>
+      `).join("")}
+    </section>
+  `;
+}
+
+function learningDetails(session) {
+  const generalRatings = Object.entries(generalRubricLabels)
+    .filter(([key]) => session.rubric?.[key])
+    .map(([key, label]) => ratingItem(label, session.rubric[key]));
+  const conceptRatings = (session.conceptCriteria || [])
+    .filter((criterion) => session.conceptRubric?.[criterion.key])
+    .map((criterion) => ratingItem(criterion.label, session.conceptRubric[criterion.key]));
+
+  if (!generalRatings.length && !conceptRatings.length) {
+    return '<p class="history-note">Attendance recorded; learning assessment not yet rated.</p>';
+  }
+
+  return `
+    <div class="learning-history">
+      ${generalRatings.length ? `<div><h5>General lab skills</h5><dl>${generalRatings.join("")}</dl></div>` : ""}
+      ${conceptRatings.length ? `<div><h5>Activity concepts</h5><dl>${conceptRatings.join("")}</dl></div>` : ""}
     </div>
   `;
+}
+
+function ratingItem(label, score) {
+  const level = rubricLevelLabels[String(score)] || "Rated";
+  return `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(score)}/4 · ${escapeHtml(level)}</dd></div>`;
+}
+
+function attendedCount(row) {
+  return row.sessions.filter((session) => session.present).length;
+}
+
+function formatDate(value) {
+  if (!value) return "Date not set";
+  const date = new Date(`${value}T00:00:00`);
+  return Number.isNaN(date.getTime()) ? value : date.toLocaleDateString("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric"
+  });
 }
 
 function performanceSummary(session, student) {
