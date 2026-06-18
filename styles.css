@@ -658,6 +658,23 @@ dialog::backdrop {
   padding: 1rem;
 }
 
+.registration-picker {
+  padding: 1rem;
+}
+
+.registration-picker label {
+  max-width: 360px;
+}
+
+.registration-view {
+  display: grid;
+  gap: 1rem;
+}
+
+.registration-view[hidden] {
+  display: none;
+}
+
 .saved-sessions-disclosure summary {
   display: flex;
   align-items: center;

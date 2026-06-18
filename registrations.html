@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Registrations | Vision Empower STEM Lab</title>
+    <meta name="description" content="School and facilitator registration for the Accessible STEM Lab portal.">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <header class="site-header">
+      <div class="shell header-grid">
+        <div class="brand-lockup">
+          <a href="index.html" aria-label="Accessible STEM Lab Portal home"><img class="brand-logo" src="assets/vision-empower-logo.png" alt="Vision Empower"></a>
+          <h1>Accessible STEM Lab Portal</h1>
+        </div>
+        <nav aria-label="Primary">
+          <a class="nav-tab nav-link-tab" href="index.html">Home</a>
+          <a class="nav-tab nav-link-tab" href="index.html#resources-view">Resources</a>
+          <a class="nav-tab nav-link-tab" href="index.html#manuals-view">Manuals</a>
+          <a class="nav-tab nav-link-tab is-active" href="registrations.html">Registrations</a>
+          <a class="nav-tab nav-link-tab" href="students.html">Students</a>
+          <a class="nav-tab nav-link-tab" href="session-entry.html">Session Entry</a>
+          <a class="nav-tab nav-link-tab" href="dashboard.html">Dashboard</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main" class="students-page">
+      <section class="shell section-head">
+        <div>
+          <p class="eyebrow">Registrations</p>
+          <h2>School and facilitator registration</h2>
+        </div>
+        <span id="registration-status" class="status-pill" role="status" aria-live="polite">Ready</span>
+      </section>
+
+      <section class="shell content-stack">
+        <div class="panel registration-picker">
+          <label for="registration-type">Registration type
+            <select id="registration-type">
+              <option value="schools">Schools</option>
+              <option value="facilitators">Facilitators</option>
+            </select>
+          </label>
+        </div>
+
+        <section id="schools-registration" class="registration-view" aria-labelledby="schools-heading">
+          <form id="school-form" class="panel student-form">
+            <input id="school-id" type="hidden">
+            <div class="section-heading-inline"><h3 id="schools-heading">School registration</h3></div>
+            <div class="form-grid">
+              <label for="school-state">State<select id="school-state" required></select></label>
+              <label for="school-district">District<select id="school-district" required></select></label>
+              <label for="school-name">School name<input id="school-name" required autocomplete="organization"></label>
+              <label for="school-type">School type
+                <select id="school-type" required>
+                  <option>Government</option><option>Government Aided</option><option>Private</option>
+                  <option>Special School</option><option>NGO/Trust</option><option>Other</option>
+                </select>
+              </label>
+              <label class="span-2" for="school-address">Address<textarea id="school-address" rows="3" autocomplete="street-address"></textarea></label>
+            </div>
+            <div class="dialog-actions"><button id="clear-school" type="button">Clear</button><button id="save-school" class="primary" type="submit">Add school</button></div>
+          </form>
+          <section class="panel student-list-panel" aria-labelledby="schools-list-heading">
+            <div class="section-heading-inline"><h3 id="schools-list-heading">Registered schools</h3><span id="schools-count" class="meta">0 schools</span></div>
+            <div class="resource-table-wrap"><table class="resource-table students-table">
+              <thead><tr><th>State</th><th>District</th><th>School name</th><th>Address</th><th>School type</th><th>Actions</th></tr></thead>
+              <tbody id="schools-table"></tbody>
+            </table></div>
+          </section>
+        </section>
+
+        <section id="facilitators-registration" class="registration-view" aria-labelledby="facilitators-heading" hidden>
+          <form id="facilitator-form" class="panel student-form">
+            <input id="facilitator-id" type="hidden">
+            <div class="section-heading-inline"><h3 id="facilitators-heading">Facilitator registration</h3></div>
+            <div class="form-grid">
+              <label for="facilitator-state">State<select id="facilitator-state" required></select></label>
+              <label for="facilitator-first-name">First name<input id="facilitator-first-name" required autocomplete="given-name"></label>
+              <label for="facilitator-last-name">Last name<input id="facilitator-last-name" required autocomplete="family-name"></label>
+              <label for="facilitator-email">Email ID<input id="facilitator-email" type="email" required autocomplete="email"></label>
+              <label for="facilitator-phone">Phone number<input id="facilitator-phone" type="tel" required autocomplete="tel"></label>
+              <label for="facilitator-alternate-phone">Alternate phone number<input id="facilitator-alternate-phone" type="tel"></label>
+              <label for="facilitator-designation">Designation<input id="facilitator-designation"></label>
+              <label for="facilitator-qualification">Qualification<input id="facilitator-qualification"></label>
+              <label for="facilitator-special-educator">Is the person a Special Educator?<select id="facilitator-special-educator"><option>No</option><option>Yes</option></select></label>
+              <label for="facilitator-educator">Is the person an Educator?<select id="facilitator-educator"><option>No</option><option>Yes</option></select></label>
+            </div>
+            <div class="dialog-actions"><button id="clear-facilitator" type="button">Clear</button><button id="save-facilitator" class="primary" type="submit">Add facilitator</button></div>
+          </form>
+          <section class="panel student-list-panel" aria-labelledby="facilitators-list-heading">
+            <div class="section-heading-inline"><h3 id="facilitators-list-heading">Registered facilitators</h3><span id="facilitators-count" class="meta">0 facilitators</span></div>
+            <div class="resource-table-wrap"><table class="resource-table students-table">
+              <thead><tr><th>State</th><th>Name</th><th>Contact</th><th>Designation</th><th>Qualification</th><th>Educator roles</th><th>Actions</th></tr></thead>
+              <tbody id="facilitators-table"></tbody>
+            </table></div>
+          </section>
+        </section>
+      </section>
+    </main>
+    <div class="shell utility-bar"><span id="toast" role="status" aria-live="polite"></span></div>
+    <script src="india-locations.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js?v=1"></script>
+    <script src="supabase-store.js?v=2"></script>
+    <script src="registrations.js?v=1"></script>
+  </body>
+</html>

@@ -1,4 +1,5 @@
 const STUDENTS_STORAGE_KEY = "veStemLabStudents.v1";
+const SCHOOLS_STORAGE_KEY = "veStemLabSchools.v1";
 const locations = window.INDIA_LOCATIONS || {};
 const states = window.INDIA_STATES || Object.keys(locations).sort((a, b) => a.localeCompare(b));
 const yesNo = ["Yes", "No"];
@@ -6,6 +7,7 @@ const brailleLevels = ["Letters", "Words", "Sentences"];
 const $ = (selector) => document.querySelector(selector);
 
 let registeredStudents = loadStudents();
+let registeredSchools = loadSchools();
 
 function setOptions(select, options, selectedValue = "") {
   select.innerHTML = options.map((option) => {
@@ -23,6 +25,18 @@ function renderDistrictOptions(selectedValue = "") {
   const state = $("#student-state").value;
   const districts = locations[state] || [];
   setOptions($("#student-district"), districts, selectedValue || districts[0] || "");
+  renderSchoolOptions();
+}
+
+function renderSchoolOptions(selectedValue = "") {
+  const state = $("#student-state").value;
+  const district = $("#student-district").value;
+  const names = [...new Set([
+    ...registeredSchools.filter((school) => school.state === state && school.district === district).map((school) => school.name),
+    ...registeredStudents.filter((student) => student.state === state && student.district === district).map((student) => student.school)
+  ].filter(Boolean))].sort();
+  setOptions($("#student-school"), names, selectedValue || names[0] || "");
+  if (!names.length) $("#student-school").innerHTML = '<option value="">Register a school first</option>';
 }
 
 function renderStaticOptions() {
@@ -49,6 +63,11 @@ function loadStudents() {
     localStorage.removeItem(STUDENTS_STORAGE_KEY);
     return [];
   }
+}
+
+function loadSchools() {
+  try { const parsed = JSON.parse(localStorage.getItem(SCHOOLS_STORAGE_KEY) || "[]"); return Array.isArray(parsed) ? parsed : []; }
+  catch { return []; }
 }
 
 function persistStudents() {
@@ -143,7 +162,7 @@ function editStudent(studentId) {
   $("#student-id").value = student.id;
   renderStateOptions(student.state);
   renderDistrictOptions(student.district);
-  $("#student-school").value = student.school;
+  renderSchoolOptions(student.school);
   $("#student-name").value = student.name;
   $("#student-gender").value = student.gender;
   $("#student-grade").value = String(student.grade);
@@ -228,11 +247,25 @@ function escapeAttr(value) {
 async function initializeStudents() {
   if (!window.StemLabStore?.isEnabled()) return;
   setStatus("Loading");
+  const [studentResult, schoolResult] = await Promise.allSettled([
+    window.StemLabStore.loadRegisteredStudents(),
+    window.StemLabStore.loadSchools()
+  ]);
   try {
-    registeredStudents = await window.StemLabStore.loadRegisteredStudents();
+    if (studentResult.status === "fulfilled") registeredStudents = studentResult.value;
+    if (schoolResult.status === "fulfilled") registeredSchools = schoolResult.value;
     persistStudents();
+    localStorage.setItem(SCHOOLS_STORAGE_KEY, JSON.stringify(registeredSchools));
+    const firstStudent = registeredStudents[0];
+    renderStateOptions(firstStudent?.state || "");
+    if (firstStudent) {
+      renderDistrictOptions(firstStudent.district);
+      renderSchoolOptions(firstStudent.school);
+    }
     renderStudentsTable();
-    setStatus("Database connected");
+    setStatus(studentResult.status === "fulfilled" ? "Database connected" : "Browser data");
+    if (studentResult.status === "rejected") throw studentResult.reason;
+    if (schoolResult.status === "rejected") toast("Students loaded. Run the updated schema to use registered school dropdowns.");
   } catch (error) {
     console.error("Student database load failed", error);
     setStatus("Browser data");
@@ -246,6 +279,7 @@ renderStudentsTable();
 initializeStudents();
 
 $("#student-state").addEventListener("change", () => renderDistrictOptions());
+$("#student-district").addEventListener("change", () => renderSchoolOptions());
 $("#student-registration-form").addEventListener("submit", saveStudent);
 $("#reset-student-form").addEventListener("click", resetForm);
 $("#registered-students-table").addEventListener("click", handleTableClick);

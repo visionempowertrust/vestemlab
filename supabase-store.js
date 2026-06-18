@@ -117,6 +117,40 @@
     if (error) throw error;
   }
 
+  async function loadSchools() {
+    const { data, error } = await client.from("stemlab_schools").select("*")
+      .order("state", { ascending: true }).order("school_name", { ascending: true });
+    if (error) throw error;
+    return (data || []).map(fromSchoolRow);
+  }
+
+  async function saveSchool(school) {
+    const { error } = await client.from("stemlab_schools").upsert(toSchoolRow(school));
+    if (error) throw error;
+  }
+
+  async function deleteSchool(id) {
+    const { error } = await client.from("stemlab_schools").delete().eq("id", id);
+    if (error) throw error;
+  }
+
+  async function loadFacilitators() {
+    const { data, error } = await client.from("stemlab_facilitators").select("*")
+      .order("state", { ascending: true }).order("first_name", { ascending: true });
+    if (error) throw error;
+    return (data || []).map(fromFacilitatorRow);
+  }
+
+  async function saveFacilitator(facilitator) {
+    const { error } = await client.from("stemlab_facilitators").upsert(toFacilitatorRow(facilitator));
+    if (error) throw error;
+  }
+
+  async function deleteFacilitator(id) {
+    const { error } = await client.from("stemlab_facilitators").delete().eq("id", id);
+    if (error) throw error;
+  }
+
   function toResourceRow(item) {
     return { id: item.id, subject: item.subject, name: item.name, image: item.image || null, video: item.video || null,
       supplier: item.supplier || null, uses: item.uses || null, tags: item.tags || [], sort_order: item.sortOrder || 0 };
@@ -166,6 +200,26 @@
       subject: row.subject || "", activityId: row.activity_id || "", activityName: row.activity_name || "",
       conceptCriteria: row.concept_criteria || [], attendance: row.attendance || [] };
   }
+  function toSchoolRow(item) {
+    return { id: item.id, state: item.state, district: item.district, school_name: item.name,
+      address: item.address || null, school_type: item.schoolType };
+  }
+  function fromSchoolRow(row) {
+    return { id: row.id, state: row.state || "", district: row.district || "", name: row.school_name || "",
+      address: row.address || "", schoolType: row.school_type || "" };
+  }
+  function toFacilitatorRow(item) {
+    return { id: item.id, state: item.state, first_name: item.firstName, last_name: item.lastName,
+      email: item.email, phone: item.phone, alternate_phone: item.alternatePhone || null,
+      designation: item.designation || null, qualification: item.qualification || null,
+      is_special_educator: item.isSpecialEducator === "Yes", is_educator: item.isEducator === "Yes" };
+  }
+  function fromFacilitatorRow(row) {
+    return { id: row.id, state: row.state || "", firstName: row.first_name || "", lastName: row.last_name || "",
+      email: row.email || "", phone: row.phone || "", alternatePhone: row.alternate_phone || "",
+      designation: row.designation || "", qualification: row.qualification || "",
+      isSpecialEducator: row.is_special_educator ? "Yes" : "No", isEducator: row.is_educator ? "Yes" : "No" };
+  }
   function studentKey(item) {
     return [item.name, item.state, item.school].map((value) => String(value || "").trim().toLowerCase()).join("::");
   }
@@ -176,5 +230,6 @@
 
   window.StemLabStore = { isEnabled, loadLabData, ensureLabSeed, saveResource, deleteResource, saveManual, deleteManual,
     loadRegisteredStudents, ensureRegisteredStudents, saveRegisteredStudent, deleteRegisteredStudent,
-    loadSessions, ensureSessions, saveSession, deleteSession };
+    loadSessions, ensureSessions, saveSession, deleteSession,
+    loadSchools, saveSchool, deleteSchool, loadFacilitators, saveFacilitator, deleteFacilitator };
 })();

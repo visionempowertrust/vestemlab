@@ -1,6 +1,8 @@
 const LAB_DATA_STORAGE_KEY = "veStemLabData.v3";
 const STUDENTS_STORAGE_KEY = "veStemLabStudents.v1";
 const SESSIONS_STORAGE_KEY = "veStemLabSessions.v1";
+const SCHOOLS_STORAGE_KEY = "veStemLabSchools.v1";
+const FACILITATORS_STORAGE_KEY = "veStemLabFacilitators.v1";
 const locations = window.INDIA_LOCATIONS || {};
 const states = window.INDIA_STATES || Object.keys(locations).sort((a, b) => a.localeCompare(b));
 const fallbackSubjects = ["Basic Science", "Maths", "Biology", "Physics", "Chemistry", "Assistive Technologies"];
@@ -20,6 +22,8 @@ const $ = (selector) => document.querySelector(selector);
 
 let students = loadArray(STUDENTS_STORAGE_KEY);
 let sessions = loadArray(SESSIONS_STORAGE_KEY);
+let schools = loadArray(SCHOOLS_STORAGE_KEY);
+let facilitators = loadArray(FACILITATORS_STORAGE_KEY);
 let attendance = [];
 let manuals = loadManuals();
 
@@ -90,9 +94,22 @@ function renderActivityOptions(selectedValue = "") {
 
 function renderSchoolOptions(selectedValue = "") {
   const state = $("#session-state").value;
-  const schools = [...new Set(students.filter((student) => !state || student.state === state).map((student) => student.school).filter(Boolean))].sort();
-  setOptions($("#session-school"), schools, selectedValue || schools[0] || "");
-  if (!schools.length) $("#session-school").innerHTML = '<option value="">No registered schools</option>';
+  const schoolNames = [...new Set([
+    ...schools.filter((school) => !state || school.state === state).map((school) => school.name),
+    ...students.filter((student) => !state || student.state === state).map((student) => student.school)
+  ].filter(Boolean))].sort();
+  setOptions($("#session-school"), schoolNames, selectedValue || schoolNames[0] || "");
+  if (!schoolNames.length) $("#session-school").innerHTML = '<option value="">No registered schools</option>';
+}
+
+function renderFacilitatorOptions(selectedValue = "") {
+  const state = $("#session-state").value;
+  const names = [...new Set([
+    ...facilitators.filter((item) => !state || item.state === state).map((item) => `${item.firstName} ${item.lastName}`.trim()),
+    ...sessions.filter((session) => !state || session.state === state).map((session) => session.facilitator)
+  ].filter(Boolean))].sort();
+  setOptions($("#session-facilitator"), names, selectedValue || names[0] || "");
+  if (!names.length) $("#session-facilitator").innerHTML = '<option value="">No registered facilitators</option>';
 }
 
 function renderGradeOptions(selectedValue = "") {
@@ -316,9 +333,9 @@ function editSession(id) {
   const session = sessions.find((item) => item.id === id);
   if (!session) return;
   $("#session-id").value = session.id;
-  $("#session-facilitator").value = session.facilitator;
   $("#session-date").value = session.date;
   $("#session-state").value = session.state;
+  renderFacilitatorOptions(session.facilitator);
   $("#session-school").value = session.school;
   renderSubjectOptions(session.subject);
   renderActivityOptions(session.activityId);
@@ -355,6 +372,7 @@ function resetSessionForm() {
   $("#session-id").value = "";
   $("#session-date").valueAsDate = new Date();
   renderStateOptions();
+  renderFacilitatorOptions();
   renderSchoolOptions();
   renderGradeOptions();
   renderSubjectOptions();
@@ -444,18 +462,25 @@ function escapeAttr(value) {
 async function initializeSessionData() {
   if (!window.StemLabStore?.isEnabled()) return;
   setStatus("Loading");
-  const [studentResult, sessionResult, labResult] = await Promise.allSettled([
+  const [studentResult, sessionResult, labResult, schoolResult, facilitatorResult] = await Promise.allSettled([
     window.StemLabStore.loadRegisteredStudents(),
     window.StemLabStore.ensureSessions(sessions),
-    window.StemLabStore.loadLabData()
+    window.StemLabStore.loadLabData(),
+    window.StemLabStore.loadSchools(),
+    window.StemLabStore.loadFacilitators()
   ]);
   if (studentResult.status === "fulfilled") students = studentResult.value;
   if (sessionResult.status === "fulfilled") sessions = sessionResult.value;
   if (labResult.status === "fulfilled" && labResult.value.manuals.length) manuals = labResult.value.manuals;
+  if (schoolResult.status === "fulfilled") schools = schoolResult.value;
+  if (facilitatorResult.status === "fulfilled") facilitators = facilitatorResult.value;
   try {
     localStorage.setItem(STUDENTS_STORAGE_KEY, JSON.stringify(students));
+    localStorage.setItem(SCHOOLS_STORAGE_KEY, JSON.stringify(schools));
+    localStorage.setItem(FACILITATORS_STORAGE_KEY, JSON.stringify(facilitators));
     persistSessions();
     renderStateOptions(students[0]?.state || "");
+    renderFacilitatorOptions();
     renderSchoolOptions();
     renderGradeOptions();
     renderSubjectOptions();
@@ -475,13 +500,14 @@ async function initializeSessionData() {
 
 renderStateOptions();
 renderSubjectOptions();
+renderFacilitatorOptions();
 renderSchoolOptions();
 renderGradeOptions();
 resetSessionForm();
 renderSessionsTable();
 initializeSessionData();
 
-$("#session-state").addEventListener("change", () => { renderSchoolOptions(); syncAttendanceRoster(); });
+$("#session-state").addEventListener("change", () => { renderFacilitatorOptions(); renderSchoolOptions(); syncAttendanceRoster(); });
 $("#session-school").addEventListener("change", syncAttendanceRoster);
 $("#session-grade-filter").addEventListener("change", syncAttendanceRoster);
 $("#session-subject").addEventListener("change", () => renderActivityOptions());
