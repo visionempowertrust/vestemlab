@@ -269,7 +269,7 @@ async function initializeDashboard() {
     dashboardRows = buildDashboardRows();
     renderFilters();
     renderDashboard();
-    $("#dashboard-status").textContent = studentResult.status === "fulfilled" ? "Students connected" : "Browser data";
+    $("#dashboard-status").textContent = studentResult.status === "fulfilled" ? "Ready" : "Browser data";
     if (studentResult.status === "rejected") throw studentResult.reason;
   } catch (error) {
     console.error("Dashboard database load failed", error);

@@ -486,7 +486,7 @@ async function initializeSessionData() {
     renderSubjectOptions();
     syncAttendanceRoster();
     renderSessionsTable();
-    setStatus(studentResult.status === "fulfilled" ? "Students connected" : "Browser data");
+    setStatus(studentResult.status === "fulfilled" ? "Ready" : "Browser data");
     if (studentResult.status === "rejected") throw studentResult.reason;
     if (sessionResult.status === "rejected" || labResult.status === "rejected") {
       toast("Students loaded. Run supabase-schema.sql to enable shared STEM Lab data.");
