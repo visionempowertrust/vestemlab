@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Vision Empower STEM Lab</title>
+    <meta
+      name="description"
+      content="Accessible STEM lab resources and activity manuals for Vision Empower."
+    >
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <header class="site-header">
+      <div class="shell header-grid">
+        <div class="brand-lockup">
+          <img class="brand-logo" src="assets/vision-empower-logo.png" alt="Vision Empower">
+          <h1>Accessible STEM Lab Portal</h1>
+        </div>
+        <nav aria-label="Primary">
+          <a class="nav-tab nav-link-tab" href="dashboard.html">Home</a>
+          <button class="nav-tab" type="button" data-view-button="resources">Resources</button>
+          <button class="nav-tab" type="button" data-view-button="manuals">Manuals</button>
+          <a class="nav-tab nav-link-tab" href="registrations.html">Registrations</a>
+          <a class="nav-tab nav-link-tab" href="session-entry.html">Session Entry</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="view is-active landing-view" id="home-view" aria-labelledby="home-heading">
+        <div class="shell landing-hero">
+          <div>
+            <p class="eyebrow">Vision Empower</p>
+            <h2 id="home-heading">Accessible STEM Lab Portal</h2>
+            <p class="lede">Browse accessible lab materials, open activity manuals, and register students for STEM lab participation.</p>
+          </div>
+          <div class="landing-actions" aria-label="Portal shortcuts">
+            <button class="primary" type="button" data-view-link="resources">View resources</button>
+            <button type="button" data-view-link="manuals">View manuals</button>
+            <a class="button-link" href="registrations.html#students">Register students</a>
+            <a class="button-link" href="session-entry.html">Enter session</a>
+            <a class="button-link" href="dashboard.html">View dashboard</a>
+          </div>
+        </div>
+
+        <div class="shell landing-grid" aria-label="Portal overview">
+          <article class="landing-card">
+            <div>
+              <span class="landing-stat" id="home-resource-count">0</span>
+              <h3>Accessible Resources</h3>
+              <p>See tactile models, STEM kits, books, assistive technology, suppliers, media links, and usage notes.</p>
+            </div>
+            <button type="button" data-view-link="resources">Open resources</button>
+          </article>
+          <article class="landing-card">
+            <div>
+              <span class="landing-stat" id="home-manual-count">0</span>
+              <h3>Activity Manuals</h3>
+              <p>Use structured activity templates with objective, resources, steps, observations, inferences, and TIK concepts.</p>
+            </div>
+            <button type="button" data-view-link="manuals">Open manuals</button>
+          </article>
+          <article class="landing-card">
+            <div>
+              <span class="landing-stat" id="home-subject-count">0</span>
+              <h3>Categories</h3>
+              <p>Filter resources and manuals by subject areas including Maths, Basic Science, CT, Biology, Physics, Chemistry, and Assistive Technologies.</p>
+            </div>
+            <a class="button-link" href="registrations.html#students">Open students</a>
+          </article>
+          <article class="landing-card">
+            <div>
+              <span class="landing-stat">+</span>
+              <h3>Science Lab Sessions</h3>
+              <p>Record facilitator, date, location, subject, activity, student name, and attendance for each lab session.</p>
+            </div>
+            <a class="button-link" href="session-entry.html">Open session entry</a>
+          </article>
+          <article class="landing-card">
+            <div>
+              <span class="landing-stat">#</span>
+              <h3>Student Dashboard</h3>
+              <p>Review each student's state, school, sessions attended, and activity-level details.</p>
+            </div>
+            <a class="button-link" href="dashboard.html">Open dashboard</a>
+          </article>
+        </div>
+      </section>
+
+      <section class="view" id="resources-view" aria-labelledby="resources-heading">
+        <div class="shell section-head">
+          <div>
+            <h2 id="resources-heading">Accessible Resources</h2>
+            <p class="lede">Manage tactile models, assistive technology, books, kits, and experiment apparatus with images, uses, and video references.</p>
+          </div>
+          <div class="action-row" aria-label="Resource actions">
+            <button class="primary" type="button" data-open-resource-form>Add resource</button>
+            <button type="button" data-export="resources">Export resources</button>
+          </div>
+        </div>
+
+        <div class="shell content-stack">
+          <div class="panel filters horizontal-filters" aria-label="Resource filters">
+            <label>
+              Search resources
+              <input id="resource-search" type="search" placeholder="Name, use, supplier">
+            </label>
+            <label>
+              Category
+              <select id="subject-filter"></select>
+            </label>
+            <label>
+              Media
+              <select id="media-filter">
+                <option value="all">All resources</option>
+                <option value="image">With image</option>
+                <option value="video">With video</option>
+                <option value="both">With image and video</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="stat-strip" aria-label="Resource summary">
+            <div><strong id="resource-count">0</strong><span>resources</span></div>
+            <div><strong id="manual-linked-count">0</strong><span>used in manuals</span></div>
+            <div><strong id="subject-count">0</strong><span>categories</span></div>
+          </div>
+          <div id="resource-list" class="resource-grid" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <section class="view" id="manuals-view" aria-labelledby="manuals-heading">
+        <div class="shell section-head">
+          <div>
+            <p class="eyebrow">Accessible Manual</p>
+            <h2 id="manuals-heading">Activity and experiment manuals</h2>
+            <p class="lede">Create structured manuals using the Vision Empower template and attach resources from the accessible catalogue.</p>
+          </div>
+          <div class="action-row" aria-label="Manual actions">
+            <button class="primary" type="button" data-open-manual-form>Add manual</button>
+            <button type="button" data-export="manuals">Export manuals</button>
+          </div>
+        </div>
+
+        <div class="shell content-stack">
+          <div class="panel filters horizontal-filters" aria-label="Manual filters">
+            <label>
+              Search manuals
+              <input id="manual-search" type="search" placeholder="Name, concept, resource">
+            </label>
+            <label>
+              Concept
+              <input id="concept-filter" type="search" placeholder="TIK or science concept">
+            </label>
+            <label>
+              Subject
+              <select id="manual-subject-filter"></select>
+            </label>
+          </div>
+
+          <div id="manual-list" class="manual-list" aria-live="polite"></div>
+        </div>
+      </section>
+    </main>
+
+    <dialog id="resource-dialog" aria-labelledby="resource-dialog-title">
+      <form id="resource-form" method="dialog" class="editor">
+        <div class="dialog-head">
+          <h3 id="resource-dialog-title">Resource</h3>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Close resource form">x</button>
+        </div>
+        <input type="hidden" name="id">
+        <div class="form-grid">
+          <label>
+            Name
+            <input name="name" required>
+          </label>
+          <label>
+            Category
+            <input name="subject" list="subject-options" required>
+          </label>
+          <label class="span-2">
+            Picture URL
+            <input name="image" type="url" placeholder="https://...">
+          </label>
+          <label class="span-2">
+            Video URL
+            <input name="video" type="url" placeholder="https://youtu.be/...">
+          </label>
+          <label class="span-2">
+            Uses
+            <textarea name="uses" rows="4" required></textarea>
+          </label>
+          <label>
+            Supplier
+            <input name="supplier">
+          </label>
+          <label>
+            Tags
+            <input name="tags" placeholder="tactile, physics, grade 8">
+          </label>
+        </div>
+        <div class="dialog-actions">
+          <button type="button" data-close-dialog>Cancel</button>
+          <button class="primary" type="submit">Save resource</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="resource-details-dialog" aria-labelledby="resource-details-title">
+      <div class="editor">
+        <div class="dialog-head">
+          <h3 id="resource-details-title">Resource details</h3>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Close resource details">x</button>
+        </div>
+        <div id="resource-details-content"></div>
+      </div>
+    </dialog>
+
+    <dialog id="manual-dialog" aria-labelledby="manual-dialog-title">
+      <form id="manual-form" method="dialog" class="editor">
+        <div class="dialog-head">
+          <h3 id="manual-dialog-title">Manual</h3>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Close manual form">x</button>
+        </div>
+        <input type="hidden" name="id">
+        <label>
+          Topic
+          <input name="name" required>
+        </label>
+        <label>
+          Subject
+          <select name="subject" id="manual-subject" required></select>
+        </label>
+        <label>
+          Objective: What we have to do?
+          <textarea name="objective" rows="3" required></textarea>
+        </label>
+        <label>
+          Resources: What do we need? Pick from accessible resources
+          <select name="resourceIds" id="manual-resource-picker" multiple size="8"></select>
+        </label>
+        <label>
+          Other resources
+          <textarea name="otherResources" rows="3" placeholder="Add resources not yet listed in the accessible catalogue"></textarea>
+        </label>
+        <label>
+          Steps: How do we proceed?
+          <textarea name="steps" rows="5" required></textarea>
+        </label>
+        <label>
+          Observations: What do we observe?
+          <textarea name="observations" rows="3"></textarea>
+        </label>
+        <label>
+          Inferences: What do we conclude?
+          <textarea name="inferences" rows="3"></textarea>
+        </label>
+        <label>
+          Concepts: (TIK)
+          <textarea name="concepts" rows="3"></textarea>
+        </label>
+        <div class="dialog-actions">
+          <button type="button" data-close-dialog>Cancel</button>
+          <button class="primary" type="submit">Save manual</button>
+        </div>
+      </form>
+    </dialog>
+
+    <div class="shell utility-bar">
+      <span id="toast" role="status" aria-live="polite"></span>
+    </div>
+
+    <dialog id="manual-details-dialog" aria-labelledby="manual-details-title">
+      <div class="editor">
+        <div class="dialog-head">
+          <h3 id="manual-details-title">Manual details</h3>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Close manual details">x</button>
+        </div>
+        <div id="manual-details-content"></div>
+      </div>
+    </dialog>
+
+    <datalist id="subject-options"></datalist>
+    <script src="data/resources-data.js"></script>
+    <script src="data/ncert-activities.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js?v=1"></script>
+    <script src="supabase-store.js?v=1"></script>
+    <script src="app.js?v=4"></script>
+  </body>
+</html>

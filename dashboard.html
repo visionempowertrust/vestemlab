@@ -15,18 +15,17 @@
     <header class="site-header">
       <div class="shell header-grid">
         <div class="brand-lockup">
-          <a href="index.html" aria-label="Accessible STEM Lab Portal home">
+          <a href="dashboard.html" aria-label="Accessible STEM Lab Portal home">
             <img class="brand-logo" src="assets/vision-empower-logo.png" alt="Vision Empower">
           </a>
           <h1>Accessible STEM Lab Portal</h1>
         </div>
         <nav aria-label="Primary">
-          <a class="nav-tab nav-link-tab" href="index.html">Home</a>
-          <a class="nav-tab nav-link-tab" href="index.html#resources-view">Resources</a>
-          <a class="nav-tab nav-link-tab" href="index.html#manuals-view">Manuals</a>
+          <a class="nav-tab nav-link-tab is-active" href="dashboard.html">Home</a>
+          <a class="nav-tab nav-link-tab" href="catalogue.html#resources-view">Resources</a>
+          <a class="nav-tab nav-link-tab" href="catalogue.html#manuals-view">Manuals</a>
           <a class="nav-tab nav-link-tab" href="registrations.html">Registrations</a>
           <a class="nav-tab nav-link-tab" href="session-entry.html">Session Entry</a>
-          <a class="nav-tab nav-link-tab is-active" href="dashboard.html">Dashboard</a>
         </nav>
       </div>
     </header>
@@ -35,32 +34,23 @@
       <section class="shell section-head">
         <div>
           <p class="eyebrow">Dashboard</p>
-          <h2>Student lab sessions</h2>
-          <p class="lede">Review each student's science lab attendance and open session-level details.</p>
+          <h2>Accessible STEM Lab Dashboard</h2>
+          <p class="lede">Review the portal catalogue, registered students, and science lab session history.</p>
         </div>
         <span id="dashboard-status" class="status-pill" role="status" aria-live="polite">Ready</span>
       </section>
 
       <section class="shell content-stack">
-        <div class="panel filters horizontal-filters dashboard-filters" aria-label="Dashboard filters">
-          <label>
-            Search
-            <input id="dashboard-search" type="search" placeholder="Student, state, school">
-          </label>
-          <label>
-            State
-            <select id="dashboard-state-filter"></select>
-          </label>
-          <label>
-            School
-            <select id="dashboard-school-filter"></select>
-          </label>
-        </div>
-
         <div class="stat-strip" aria-label="Dashboard summary">
+          <div><strong id="dashboard-resource-count">0</strong><span>accessible resources</span></div>
+          <div><strong id="dashboard-manual-count">0</strong><span>activity manuals</span></div>
           <div><strong id="dashboard-student-count">0</strong><span>students</span></div>
           <div><strong id="dashboard-session-count">0</strong><span>saved sessions</span></div>
-          <div><strong id="dashboard-attendance-count">0</strong><span>attendances</span></div>
+        </div>
+
+        <div class="dashboard-section-heading">
+          <h3>Student lab sessions</h3>
+          <p class="meta">Review attendance and learning history for each registered student.</p>
         </div>
 
         <section class="panel student-list-panel" aria-labelledby="student-dashboard-heading">
@@ -68,6 +58,14 @@
             <h3 id="student-dashboard-heading">Student records</h3>
             <span id="dashboard-row-count" class="meta">0 records</span>
           </div>
+          <details class="record-filters">
+            <summary><span>Filter student records</span></summary>
+            <div class="filters horizontal-filters dashboard-filters" aria-label="Dashboard filters">
+              <label>Search<input id="dashboard-search" type="search" placeholder="Student, state, school"></label>
+              <label>State<select id="dashboard-state-filter"></select></label>
+              <label>School<select id="dashboard-school-filter"></select></label>
+            </div>
+          </details>
           <div class="resource-table-wrap">
             <table class="resource-table students-table">
               <thead>
@@ -96,9 +94,11 @@
       </div>
     </dialog>
 
+    <script src="data/resources-data.js"></script>
+    <script src="data/ncert-activities.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js?v=1"></script>
     <script src="supabase-store.js?v=1"></script>
-    <script src="dashboard.js?v=4"></script>
+    <script src="dashboard.js?v=6"></script>
   </body>
 </html>

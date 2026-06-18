@@ -1,5 +1,6 @@
 const STUDENTS_STORAGE_KEY = "veStemLabStudents.v1";
 const SESSIONS_STORAGE_KEY = "veStemLabSessions.v1";
+const LAB_DATA_STORAGE_KEY = "veStemLabData.v3";
 const $ = (selector) => document.querySelector(selector);
 const generalRubricLabels = {
   materialHandling: "Material handling",
@@ -16,6 +17,7 @@ const rubricLevelLabels = {
 
 let students = loadArray(STUDENTS_STORAGE_KEY);
 let sessions = loadArray(SESSIONS_STORAGE_KEY);
+let labData = loadLabSummary();
 let dashboardRows = buildDashboardRows();
 
 function loadArray(key) {
@@ -26,6 +28,20 @@ function loadArray(key) {
     localStorage.removeItem(key);
     return [];
   }
+}
+
+function loadLabSummary() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(LAB_DATA_STORAGE_KEY) || "{}");
+    if (Array.isArray(stored.resources) && Array.isArray(stored.manuals)) return stored;
+  } catch {
+    // Fall through to bundled catalogue data.
+  }
+  return {
+    resources: Array.isArray(window.ARC_RESOURCES) ? window.ARC_RESOURCES : [],
+    // The catalogue seeds 12 portal activities in addition to the NCERT imports.
+    manuals: Array.from({ length: 12 + (Array.isArray(window.NCERT_ACTIVITIES) ? window.NCERT_ACTIVITIES.length : 0) })
+  };
 }
 
 function buildDashboardRows() {
@@ -101,7 +117,8 @@ function renderDashboard() {
   $("#dashboard-row-count").textContent = `${rows.length} record${rows.length === 1 ? "" : "s"}`;
   $("#dashboard-student-count").textContent = dashboardRows.length;
   $("#dashboard-session-count").textContent = sessions.length;
-  $("#dashboard-attendance-count").textContent = dashboardRows.reduce((sum, row) => sum + attendedCount(row), 0);
+  $("#dashboard-resource-count").textContent = labData.resources.length;
+  $("#dashboard-manual-count").textContent = labData.manuals.length;
 
   if (!rows.length) {
     $("#dashboard-table").innerHTML = '<tr><td colspan="5" class="empty-table-cell">No student records match the current filters.</td></tr>';
@@ -238,13 +255,15 @@ function escapeAttr(value) {
 async function initializeDashboard() {
   if (!window.StemLabStore?.isEnabled()) return;
   $("#dashboard-status").textContent = "Loading";
-  const [studentResult, sessionResult] = await Promise.allSettled([
+  const [studentResult, sessionResult, labResult] = await Promise.allSettled([
     window.StemLabStore.loadRegisteredStudents(),
-    window.StemLabStore.ensureSessions(sessions)
+    window.StemLabStore.ensureSessions(sessions),
+    window.StemLabStore.loadLabData()
   ]);
   try {
     if (studentResult.status === "fulfilled") students = studentResult.value;
     if (sessionResult.status === "fulfilled") sessions = sessionResult.value;
+    if (labResult.status === "fulfilled") labData = labResult.value;
     localStorage.setItem(STUDENTS_STORAGE_KEY, JSON.stringify(students));
     localStorage.setItem(SESSIONS_STORAGE_KEY, JSON.stringify(sessions));
     dashboardRows = buildDashboardRows();
