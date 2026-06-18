@@ -107,11 +107,11 @@
           </div>
         </form>
 
-        <section class="panel student-list-panel" aria-labelledby="saved-sessions-heading">
-          <div class="section-heading-inline">
-            <h3 id="saved-sessions-heading">Saved sessions</h3>
+        <details class="panel student-list-panel saved-sessions-disclosure">
+          <summary>
+            <span class="saved-sessions-link">Saved Sessions</span>
             <span id="sessions-count" class="meta">0 sessions</span>
-          </div>
+          </summary>
           <div class="resource-table-wrap">
             <table class="resource-table students-table">
               <thead>
@@ -130,7 +130,7 @@
               <tbody id="sessions-table"></tbody>
             </table>
           </div>
-        </section>
+        </details>
       </section>
     </main>
 
@@ -143,6 +143,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js?v=1"></script>
     <script src="supabase-store.js?v=1"></script>
-    <script src="session-entry.js?v=5"></script>
+    <script src="session-entry.js?v=6"></script>
   </body>
 </html>

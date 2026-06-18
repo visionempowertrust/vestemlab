@@ -658,6 +658,42 @@ dialog::backdrop {
   padding: 1rem;
 }
 
+.saved-sessions-disclosure summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  cursor: pointer;
+  list-style: none;
+}
+
+.saved-sessions-disclosure summary::-webkit-details-marker {
+  display: none;
+}
+
+.saved-sessions-link {
+  color: var(--brand-dark);
+  font-size: 1.05rem;
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.saved-sessions-disclosure summary::after {
+  content: "+";
+  color: var(--brand-dark);
+  font-size: 1.35rem;
+  font-weight: 800;
+}
+
+.saved-sessions-disclosure[open] summary::after {
+  content: "-";
+}
+
+.saved-sessions-disclosure[open] .resource-table-wrap {
+  margin-top: 1rem;
+}
+
 .section-heading-inline {
   display: flex;
   justify-content: space-between;
