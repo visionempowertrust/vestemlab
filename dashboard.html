@@ -42,55 +42,81 @@
 
       <section class="shell content-stack">
         <div class="stat-strip" aria-label="Dashboard summary">
-          <div><strong id="dashboard-resource-count">0</strong><span>accessible resources</span></div>
-          <div><strong id="dashboard-manual-count">0</strong><span>activity manuals</span></div>
-          <div><strong id="dashboard-student-count">0</strong><span>students</span></div>
-          <div><strong id="dashboard-session-count">0</strong><span>saved sessions</span></div>
+          <a class="stat-card" href="catalogue.html#resources-view"><strong id="dashboard-resource-count">0</strong><span>accessible resources</span></a>
+          <a class="stat-card" href="catalogue.html#manuals-view"><strong id="dashboard-manual-count">0</strong><span>activity manuals</span></a>
+          <a class="stat-card" href="registrations.html#students"><strong id="dashboard-student-count">0</strong><span>students</span></a>
+          <button id="open-usage" class="stat-card" type="button"><strong id="dashboard-session-count">0</strong><span>saved sessions</span></button>
         </div>
 
-        <div class="dashboard-section-heading">
-          <h3>Student lab sessions</h3>
-          <p class="meta">Review attendance and learning history for each registered student.</p>
-        </div>
-
-        <section class="panel student-list-panel" aria-labelledby="student-dashboard-heading">
-          <div class="section-heading-inline">
-            <h3 id="student-dashboard-heading">Student records</h3>
-            <span id="dashboard-row-count" class="meta">0 records</span>
+        <details id="stem-usage" class="panel dashboard-disclosure">
+          <summary>
+            <span><strong>STEM Labs Usage</strong><small>Session-level records by date, location, and facilitator.</small></span>
+            <span id="usage-record-count" class="meta">0 sessions</span>
+          </summary>
+          <div class="resource-table-wrap dashboard-table-wrap">
+            <table class="resource-table students-table">
+              <thead>
+                <tr>
+                  <th scope="col">Date</th>
+                  <th scope="col">State</th>
+                  <th scope="col">School</th>
+                  <th scope="col">Facilitator</th>
+                  <th scope="col">More Details</th>
+                </tr>
+              </thead>
+              <tbody id="usage-table"></tbody>
+            </table>
           </div>
-          <details class="record-filters">
-            <summary><span>Filter student records</span></summary>
-            <div class="filters horizontal-filters dashboard-filters" aria-label="Dashboard filters">
-              <label>Search<input id="dashboard-search" type="search" placeholder="Student, state, school"></label>
-              <label>State<select id="dashboard-state-filter"></select></label>
-              <label>School<select id="dashboard-school-filter"></select></label>
+        </details>
+
+        <section class="panel participation-panel" aria-labelledby="participation-heading">
+          <div class="section-heading-inline">
+            <div>
+              <h3 id="participation-heading">Student Participation</h3>
+              <p class="meta">Select a student to review attended sessions and longitudinal performance.</p>
             </div>
-          </details>
+            <span id="participation-record-count" class="meta">0 sessions</span>
+          </div>
+
+          <div class="filters participation-filters" aria-label="Student participation filters">
+            <label>State<select id="participation-state"></select></label>
+            <label>School<select id="participation-school"></select></label>
+            <label>Grade<select id="participation-grade"></select></label>
+            <label>Student<select id="participation-student"></select></label>
+            <label>From date<input id="participation-date-from" type="date"></label>
+            <label>To date<input id="participation-date-to" type="date"></label>
+          </div>
+
           <div class="resource-table-wrap">
             <table class="resource-table students-table">
               <thead>
                 <tr>
-                  <th scope="col">State</th>
-                  <th scope="col">School</th>
-                  <th scope="col">Student name</th>
-                  <th scope="col">Lab sessions attended</th>
-                  <th scope="col">More Details</th>
+                  <th scope="col">Date</th>
+                  <th scope="col">Subject</th>
+                  <th scope="col">Activity</th>
+                  <th scope="col">Facilitator</th>
+                  <th scope="col">Performance</th>
                 </tr>
               </thead>
-              <tbody id="dashboard-table"></tbody>
+              <tbody id="participation-table"></tbody>
             </table>
           </div>
+
+          <section class="trend-summary" aria-labelledby="trend-summary-heading">
+            <h4 id="trend-summary-heading">AI-generated longitudinal summary</h4>
+            <p id="trend-summary-text">Select a student to generate a longitudinal performance summary.</p>
+          </section>
         </section>
       </section>
     </main>
 
-    <dialog id="student-details-dialog" aria-labelledby="student-details-title">
+    <dialog id="session-details-dialog" aria-labelledby="session-details-title">
       <div class="editor">
         <div class="dialog-head">
-          <h3 id="student-details-title">Student details</h3>
-          <button class="icon-button" type="button" data-close-dialog aria-label="Close student details">x</button>
+          <h3 id="session-details-title">Session details</h3>
+          <button class="icon-button" type="button" data-close-dialog aria-label="Close session details">x</button>
         </div>
-        <div id="student-details-content"></div>
+        <div id="session-details-content"></div>
       </div>
     </dialog>
 
@@ -99,6 +125,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js?v=1"></script>
     <script src="supabase-store.js?v=1"></script>
-    <script src="dashboard.js?v=7"></script>
+    <script src="dashboard.js?v=8"></script>
   </body>
 </html>

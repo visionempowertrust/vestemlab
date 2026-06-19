@@ -355,20 +355,31 @@ textarea {
   gap: 0.75rem;
 }
 
-.stat-strip div {
+.stat-card {
+  display: block;
   background: #ffffff;
   border: 1px solid var(--line);
   border-radius: 8px;
+  color: var(--ink);
+  min-height: 88px;
   padding: 0.85rem;
+  text-align: left;
+  text-decoration: none;
+  width: 100%;
 }
 
-.stat-strip strong {
+.stat-card:hover {
+  border-color: var(--brand);
+  box-shadow: 0 3px 12px rgba(23, 33, 43, 0.08);
+}
+
+.stat-card strong {
   display: block;
   font-size: 1.55rem;
   line-height: 1.1;
 }
 
-.stat-strip span,
+.stat-card span,
 .meta,
 .hint {
   color: var(--muted);
@@ -673,6 +684,87 @@ dialog::backdrop {
   margin: 0.25rem 0 0;
 }
 
+.dashboard-disclosure {
+  padding: 1rem;
+  scroll-margin-top: 1rem;
+}
+
+.dashboard-disclosure > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  cursor: pointer;
+  list-style: none;
+}
+
+.dashboard-disclosure > summary::-webkit-details-marker {
+  display: none;
+}
+
+.dashboard-disclosure > summary > span:first-child {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.dashboard-disclosure > summary strong {
+  font-size: 1.2rem;
+}
+
+.dashboard-disclosure > summary small {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.dashboard-disclosure > summary::after {
+  content: "+";
+  color: var(--brand-dark);
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+
+.dashboard-disclosure[open] > summary::after {
+  content: "-";
+}
+
+.dashboard-table-wrap {
+  margin-top: 1rem;
+}
+
+.participation-panel {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.participation-panel .section-heading-inline {
+  margin-bottom: 0;
+}
+
+.participation-panel .section-heading-inline p {
+  margin: 0.25rem 0 0;
+}
+
+.participation-filters {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.trend-summary {
+  border-left: 4px solid var(--brand);
+  background: var(--soft);
+  padding: 0.9rem 1rem;
+}
+
+.trend-summary h4 {
+  margin: 0 0 0.4rem;
+}
+
+.trend-summary p {
+  margin: 0;
+}
+
 .record-filters {
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
@@ -971,6 +1063,14 @@ dialog::backdrop {
   .form-grid,
   .landing-grid {
     grid-template-columns: 1fr;
+  }
+
+  .participation-filters {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-disclosure > summary {
+    align-items: flex-start;
   }
 
   .manual-dashboard-row {
