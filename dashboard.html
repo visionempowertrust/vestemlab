@@ -69,44 +69,44 @@
           </div>
         </details>
 
-        <section class="panel participation-panel" aria-labelledby="participation-heading">
-          <div class="section-heading-inline">
-            <div>
-              <h3 id="participation-heading">Student Participation</h3>
-              <p class="meta">Select a student to review attended sessions and longitudinal performance.</p>
-            </div>
+        <details class="panel dashboard-disclosure participation-panel" aria-labelledby="participation-heading">
+          <summary>
+            <span><strong id="participation-heading">Student Participation</strong><small>Select a student to review attended sessions and longitudinal performance.</small></span>
             <span id="participation-record-count" class="meta">0 sessions</span>
-          </div>
+          </summary>
 
-          <div class="filters participation-filters" aria-label="Student participation filters">
-            <label>State<select id="participation-state"></select></label>
-            <label>School<select id="participation-school"></select></label>
-            <label>Grade<select id="participation-grade"></select></label>
-            <label>Student<select id="participation-student"></select></label>
-            <label>From date<input id="participation-date-from" type="date"></label>
-            <label>To date<input id="participation-date-to" type="date"></label>
-          </div>
+          <div class="participation-content">
 
-          <div class="resource-table-wrap">
-            <table class="resource-table students-table">
-              <thead>
-                <tr>
-                  <th scope="col">Date</th>
-                  <th scope="col">Subject</th>
-                  <th scope="col">Activity</th>
-                  <th scope="col">Facilitator</th>
-                  <th scope="col">Performance</th>
-                </tr>
-              </thead>
-              <tbody id="participation-table"></tbody>
-            </table>
-          </div>
+            <div class="filters participation-filters" aria-label="Student participation filters">
+              <label>State<select id="participation-state"></select></label>
+              <label>School<select id="participation-school"></select></label>
+              <label>Grade<select id="participation-grade"></select></label>
+              <label>Student<select id="participation-student"></select></label>
+              <label>From date<input id="participation-date-from" type="date"></label>
+              <label>To date<input id="participation-date-to" type="date"></label>
+            </div>
 
-          <section class="trend-summary" aria-labelledby="trend-summary-heading">
-            <h4 id="trend-summary-heading">AI-generated longitudinal summary</h4>
-            <p id="trend-summary-text">Select a student to generate a longitudinal performance summary.</p>
-          </section>
-        </section>
+            <div class="resource-table-wrap">
+              <table class="resource-table students-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Date</th>
+                    <th scope="col">Subject</th>
+                    <th scope="col">Activity</th>
+                    <th scope="col">Facilitator</th>
+                    <th scope="col">Performance</th>
+                  </tr>
+                </thead>
+                <tbody id="participation-table"></tbody>
+              </table>
+            </div>
+
+            <section class="trend-summary" aria-labelledby="trend-summary-heading">
+              <h4 id="trend-summary-heading">AI-generated longitudinal summary</h4>
+              <p id="trend-summary-text">Select a student to generate a longitudinal performance summary.</p>
+            </section>
+          </div>
+        </details>
       </section>
     </main>
 
@@ -125,6 +125,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js?v=1"></script>
     <script src="supabase-store.js?v=1"></script>
-    <script src="dashboard.js?v=8"></script>
+    <script src="dashboard.js?v=9"></script>
   </body>
 </html>

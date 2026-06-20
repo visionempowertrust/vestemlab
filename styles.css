@@ -732,17 +732,13 @@ dialog::backdrop {
 }
 
 .participation-panel {
-  display: grid;
-  gap: 1rem;
   padding: 1rem;
 }
 
-.participation-panel .section-heading-inline {
-  margin-bottom: 0;
-}
-
-.participation-panel .section-heading-inline p {
-  margin: 0.25rem 0 0;
+.participation-content {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
 }
 
 .participation-filters {
